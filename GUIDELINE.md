@@ -64,10 +64,18 @@ Keep the human-facing docs human-facing: put the dense agent material in
 
 ### Pillar 2 — One source of truth, zero drift
 
-Pick one document as **ground truth** for behavior (we used `SPECIFICATION.md`),
-and make the code and every other doc agree with it. Drift is worse than missing
-docs: an agent that trusts a confident-but-wrong statement fails in ways that are
-hard to debug.
+Designate one **ground truth** for behavior and make every other doc agree with
+it. Drift is worse than missing docs: an agent that trusts a confident-but-wrong
+statement fails in ways that are hard to debug.
+
+Ground truth is usually **the code and its in-language docs (godoc/docstrings)** —
+for a simple library that *is* the authority, and the agent manual derives from
+it. Reach for a dedicated spec document (we used `SPECIFICATION.md`) only when
+behavior is complex enough that it isn't self-evident from the code (binarystruct
+earned one: a tag grammar plus three parallel execution paths). Don't add a
+parallel spec to a simple project — it just becomes one more thing to drift. When
+in doubt, name the authority in the manual ("if the docs and code disagree, the
+code wins") rather than creating a new document.
 
 - When you change behavior, update ground truth in the same change.
 - Periodically diff docs against code. (In our conversion this caught a

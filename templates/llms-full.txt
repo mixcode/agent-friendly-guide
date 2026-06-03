@@ -3,6 +3,10 @@
 This document gives LLM agents and code assistants the rules, syntax, patterns,
 and known traps needed to use {Project Name} correctly on the first try.
 
+> **Source of truth:** {the code and its godoc/docstrings, or a named spec doc
+> such as SPECIFICATION.md}. This manual is *derived* from it — if they ever
+> disagree, the source of truth wins.
+
 <!--
 HOW TO USE THIS TEMPLATE
 - Fill each section; delete sections that genuinely don't apply (don't leave

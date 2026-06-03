@@ -38,6 +38,10 @@ State the target repo and the mode in one line before you start.
   else becomes a clearly-marked `{TODO: ...}` placeholder. A confident-but-wrong
   manual is worse than a stub — it causes drift, the thing the method exists to
   prevent.
+- **Stay internally consistent.** If you mark something `{TODO}` or unverified,
+  do not state it as confirmed anywhere else — hedge it the same way every place
+  it appears (e.g. "appears to X — unverified, see TODO"). A doc that contradicts
+  itself is exactly the drift this method exists to prevent.
 - **Don't overwrite existing files silently.** If `llms.txt`, `llms-full.txt`, or
   `AGENTS.txt` already exist, show a diff/summary and ask before changing them.
 - **Match the repo's conventions** (style, headings, language). For non-English
@@ -70,7 +74,7 @@ Then score each item (✅ good / ⚠️ weak / ❌ missing) with a one-line note
 - [ ] The manual is included in the *published* artifact, not just the repo.
 
 **Correctness & trust**
-- [ ] A single ground-truth doc exists and matches the code.
+- [ ] The source of truth is clear (a spec doc, or the code/godoc) and the docs match it.
 - [ ] Translated/secondary docs are at parity or marked.
 - [ ] Common traps (argument order, concurrency, surprising-but-deliberate
       behavior, modes/flags) are documented with the *why*.
@@ -90,7 +94,19 @@ End Phase 1 with the **top 3–5 highest-leverage fixes**. If `--audit-only`, st
 
 ## Phase 2 — Scaffold
 
-Generate or update the agent artifacts from the templates in
+**First, establish the source of truth** — what the docs must agree with, so
+there is one authority and the rest derive from it:
+- If the repo already has a ground-truth/spec doc, defer to it and check the new
+  docs for parity against it.
+- If it does not, the **code and its in-language docs (godoc / docstrings) are
+  the authority**. Do NOT invent a parallel spec for a simple project — that just
+  adds another thing to drift. Instead add a one-line precedence note to the
+  manual, e.g. *"Source of truth: the code and godoc; this file is derived — if
+  they disagree, the code wins."*
+- Only **recommend** creating a dedicated spec doc when behavior is complex
+  enough that it isn't self-evident from the code (flag it; don't auto-create).
+
+Then generate or update the agent artifacts from the templates in
 `${CLAUDE_PLUGIN_ROOT}/templates/` (`llms.txt`, `llms-full.txt`, `AGENTS.txt`).
 For each:
 
@@ -98,7 +114,9 @@ For each:
 2. Fill every section you can from verified repo facts; leave `{TODO: ...}`
    placeholders for anything you can't confirm (especially the traps and
    recipes — those need real API knowledge).
-3. Write the file at the repo root (confirm first if it already exists).
+3. Write the file at the repo root (confirm first if it already exists). For
+   files that already exist (README, the doc surface), make **additive** edits —
+   insert a callout/pointer and show what changed; never silently rewrite them.
 
 Then wire **discoverability** (the cheapest, highest-return fixes):
 - Add a short callout near the top of the README pointing to `llms-full.txt`.
@@ -107,8 +125,18 @@ Then wire **discoverability** (the cheapest, highest-return fixes):
 If the audit found a clear "common pattern," draft a copy-pasteable **recipe**
 for it (or a `{TODO}` recipe stub if you can't verify the API).
 
-Summarize what you created/changed and list the remaining `{TODO}` placeholders
-the maintainer must fill. If `--scaffold`, stop here.
+## Phase 2.5 — Cross-check (before finishing)
+
+Re-read every file you generated or edited, against the source of truth and
+against each other. Confirm and fix before reporting:
+- Every factual claim traces to something you actually read (else hedge or `{TODO}`).
+- Nothing asserted in one place is marked `{TODO}` / unverified in another.
+- Code snippets and recipes use real identifiers and would plausibly compile.
+- Internal links and file references resolve.
+
+Then summarize what you created/changed, list the remaining `{TODO}` placeholders
+the maintainer must fill, and note in one line what you cross-checked. If
+`--scaffold`, stop here.
 
 ---
 
