@@ -231,8 +231,8 @@ and it pays to know which ones your toolchain hands you for free.
 
 ## 3. The audit checklist
 
-A quick pass over any repo. (A fuller, tool-runnable version will live alongside
-this guide.)
+A quick pass over any repo. The `agent-ready` skill scores against this exact
+checklist automatically (see the README to install it).
 
 > This checklist is the **single source** the `agent-ready` skill scores against —
 > `SKILL.md` references it rather than keeping its own copy. Edit it here only.
@@ -300,11 +300,11 @@ items **N/A** with a reason rather than ❌.
 
 ## 5. Case study: binarystruct (worked example)
 
-A condensed before/after lives in [`case-study/binarystruct.md`](case-study/binarystruct.md)
-(to be added): what each pillar looked like in practice, the clean-agent
-evaluation that scored 5/5, and the gap it surfaced that drove the next feature.
+A condensed before/after lives in [`case-study/binarystruct.md`](case-study/binarystruct.md):
+what each pillar looked like in practice, the clean-agent evaluation that scored
+5/5, and the gap it surfaced that drove the next feature.
 
 ---
 
-*This guideline is the source of truth for the companion Agent Skill (to be
-built), which executes the audit and scaffolds the artifacts above.*
+*This guideline is the source of truth for the companion `agent-ready` skill,
+which executes the audit and scaffolds the artifacts above.*
