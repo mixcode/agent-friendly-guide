@@ -57,6 +57,16 @@ Detect the basics, then score the repo against the checklist and produce a
 **prioritized gap report** (group findings as: missing / present-but-weak / good).
 
 Detect first:
+- **Repo type** — how an agent consumes it. State which it is and the signals you
+  used:
+  - **CLI tool** — a `bin`/`cmd/` dir, a `main` that parses flags/subcommands
+    (cobra/clap/argparse), or a `package.json` `bin` / Python `console_scripts`.
+  - **MCP server** — a `.mcp.json`, MCP SDK imports
+    (`@modelcontextprotocol/sdk`, the `mcp` Python pkg), or code registering tools.
+  - **Library / API** — exported API, no `main` / no CLI entry point.
+  - **Plugin / skill** — a `SKILL.md` or `.claude-plugin/plugin.json`.
+  - **Docs / methodology** — mostly Markdown, no package to install.
+  A repo can be more than one (e.g. a library that also ships a CLI) — note both.
 - Language/ecosystem and how the package is published & consumed (so you know
   where the manual must travel — module vendoring, npm `files`, Python package
   data, etc.).
@@ -71,9 +81,13 @@ groups are *Discoverability*, *Correctness & trust*, *Usability*,
 *Contributor-readiness*, and *Evidence* — use them as section headers in your
 report.
 
-Not every item applies to every repo: if the target isn't a conventional code
-library (e.g. a CLI app, a docs/methodology repo, or a plugin), mark inapplicable
-items **N/A** with a one-line reason rather than forcing a ❌.
+**Apply the type overlay.** §3 ends with **Type overlays** (CLI tool, MCP server).
+If the repo is one of those, score its overlay items too — for tools the
+selection surface (a clear "use when / not for"), the invocation contract, output
+and error legibility, and read-vs-mutating clarity are usually the highest-value
+gaps. For any type, mark inapplicable core items **N/A** with a one-line reason
+(e.g. a docs/methodology repo has no "errors name the location" item) rather than
+forcing a ❌.
 
 End Phase 1 with the **top 3–5 highest-leverage fixes**. If `--audit-only`, stop here.
 
@@ -104,6 +118,13 @@ For each:
 3. Write the file at the repo root (confirm first if it already exists). For
    files that already exist (README, the doc surface), make **additive** edits —
    insert a callout/pointer and show what changed; never silently rewrite them.
+
+**Match the manual to the repo type** (from Phase 1). For a **CLI or MCP server**,
+the manual is tool-facing, not an API cheat sheet — lead with the **selection
+surface** ("use when / not for"), then the **invocation contract** (commands/flags
+or tool name + input schema, auth/env), then **output and error legibility** and
+which operations mutate state. For a **library**, the API cheat sheet + recipes
+lead. (No dedicated tool-card template yet — fill `llms-full.txt` tool-style.)
 
 Then wire **discoverability** (the cheapest, highest-return fixes):
 - Add a short callout near the top of the README pointing to `llms-full.txt`.

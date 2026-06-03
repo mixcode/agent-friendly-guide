@@ -33,11 +33,44 @@ And two levels of effort, with very different payoff curves:
 
 The feedback loop (pillar 7) is what tells you when you're done.
 
+### Repo types — what "consume" means
+
+How an agent consumes the repo differs by type, and that shifts what matters:
+
+| Type | How an agent consumes it | Emphasize |
+| :--- | :--- | :--- |
+| **Library / API** | writes code against it (import, call) | API ergonomics, recipes, traps |
+| **CLI tool** | invokes commands (flags, stdin/stdout, exit codes) | usage/`--help`, machine-readable output, side-effect clarity |
+| **Service / HTTP API** | sends requests (endpoints, auth, schemas) | endpoint/auth/schema docs, actionable error bodies |
+| **MCP server** | calls tools (tool name, input schema, when-to-use) | per-tool `description`s, schemas, read-vs-mutating |
+| **Plugin / skill** | the harness loads it (descriptions, slash commands) | the `description` / when-to-use surface |
+| **Docs / methodology** | reads it | structure, a clear entry point, internal consistency |
+
+Libraries are *imported*; tools are *found, chosen, and operated* — a distinct
+target. Most agent work today is tool use, so the method covers both.
+
+### The find → select → use lens
+
+Cutting across every type, an agent must do three things — make each easy:
+
+- **Find** — learn the thing exists and is relevant (discoverability).
+- **Select** — decide to use *this* over alternatives, and know its scope and
+  limits. The *selection surface* — a one-line "use when … / not for …", trigger
+  phrases, an MCP tool `description`, a CLI's purpose line — is the most
+  underweighted dimension, and it is exactly what tool use hinges on.
+- **Use** — invoke it correctly the first time (traps, recipes, error legibility).
+
+The seven pillars serve all three; **find** and **select** both live in pillar 1.
+
 ---
 
 ## 2. The method — seven pillars
 
-### Pillar 1 — A machine-readable entry point, co-located in the repo
+### Pillar 1 — Find & select: an entry point an agent can reach and choose
+
+This pillar covers the first two of find/select/use. **Find** is discoverability —
+the machine-readable entry point below. **Select** is the *selection surface* — how
+the agent decides this is the right thing for the job.
 
 Ship a dedicated agent manual **inside the repo**, not only on a docs site.
 
@@ -61,6 +94,20 @@ Then make it **discoverable** from the places an agent already lands:
 
 Keep the human-facing docs human-facing: put the dense agent material in
 `llms-full.txt` and *link* to it, rather than bloating the README/godoc.
+
+**Selection surface (so the agent picks you for the right job).** Discoverability
+gets the agent *to* you; the selection surface gets it to use you *correctly*.
+State, where the agent looks first:
+- **what it's for in one line, and what it's *not* for** — scope and limits;
+- the **trigger phrases / when-to-use** matching how an agent would describe the
+  task. For a skill or MCP tool this is the `description`; for a CLI, the purpose
+  line in `--help`; for a library, the README's opening sentence.
+
+A precise "use when / not for" prevents both non-use (the agent never picks you)
+and misuse (it picks you for the wrong job). This matters most for **tools**, where
+the agent chooses among many at invocation time. Worked example: the `agent-ready`
+skill's `description` — verb-first, with the trigger phrases an agent would think
+in ("make a repo agent-friendly", "add llms.txt").
 
 ### Pillar 2 — One source of truth, zero drift
 
@@ -214,6 +261,25 @@ this guide.)
 **Evidence**
 - [ ] A clean-agent evaluation has been run on the *published* artifact, and its
       friction log triaged.
+
+### Type overlays
+
+Apply on top of the core checklist for the repo's type; mark inapplicable core
+items **N/A** with a reason rather than ❌.
+
+**CLI tool** (consumed by *invoking commands*)
+- [ ] `--help` / usage is complete: subcommands, flags, defaults.
+- [ ] **Select:** a one-line "use when / not for" — the purpose is clear from `--help` or the README's first line.
+- [ ] Output is machine-parseable (a `--json`/quiet mode, or stable format) and exit codes are meaningful.
+- [ ] Side effects are clear: read-only vs mutating commands are distinguishable (so a harness can gate them); a dry-run exists for destructive ones.
+- [ ] Auth / env / config prerequisites are documented for headless use.
+
+**MCP server** (consumed by *calling tools*)
+- [ ] **Select:** each tool's `description` says when to use it — and when not — in task terms.
+- [ ] Input schemas are complete, with per-field descriptions and at least one example.
+- [ ] Tool outputs are structured and self-explanatory; errors say what the agent should do next.
+- [ ] Read-only vs mutating tools are distinguishable (annotations or naming) for gating.
+- [ ] Server setup/auth (env vars, config) is documented for headless/non-interactive runs.
 
 ---
 
