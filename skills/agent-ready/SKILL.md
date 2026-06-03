@@ -6,20 +6,30 @@ argument-hint: "[--audit-only | --scaffold]"
 
 # agent-ready
 
-Make the **current repository** agent-friendly, following the method in
+Make a target repository agent-friendly, following the method in
 `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md` (read it if you need the full rationale; the
-operational steps are below). Work on the repo rooted at the current working
-directory.
+operational steps are below).
 
-## Modes (parse from `$ARGUMENTS`)
+## Target repository
 
-Inspect `$ARGUMENTS` for a switch and pick the stopping point. Default = full.
+The invocation arguments are appended to this skill (look for an `ARGUMENTS:`
+line). Decide which repo to work on, in this order:
+
+1. If the arguments name a path, use that repo.
+2. Otherwise use the current working directory — but **first confirm** it is the
+   repo the user means: state the absolute path you're about to audit and what it
+   appears to be, and proceed unless that looks wrong.
+
+## Modes
+
+The arguments may include a mode switch. Pick the stopping point; default to the
+full run when no switch is present:
 
 - **`--audit-only`** → run Phase 1 only, then stop.
 - **`--scaffold`** → run Phases 1–2, then stop (do not offer the evaluation).
-- **(no switch / anything else)** → full run: Phases 1–3.
+- **(no switch)** → full run: Phases 1–3.
 
-State which mode you're running in one line before you start.
+State the target repo and the mode in one line before you start.
 
 ## Guardrails (read before writing anything)
 
