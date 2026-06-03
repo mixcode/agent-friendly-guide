@@ -67,6 +67,12 @@ Detect first:
   - **Plugin / skill** — a `SKILL.md` or `.claude-plugin/plugin.json`.
   - **Docs / methodology** — mostly Markdown, no package to install.
   A repo can be more than one (e.g. a library that also ships a CLI) — note both.
+  Judge by **real artifacts** — a manifest/config file actually present, or an
+  import/dependency in *source* — not by a marker string appearing in prose. A
+  doc or skill that merely *describes* a signal is not that type: exclude
+  `*.md`, `SKILL.md`, and `templates/` from marker greps (e.g. a file that
+  mentions `modelcontextprotocol` to *explain* MCP detection is not an MCP
+  server). When unsure, confirm the signal's source before classifying.
 - Language/ecosystem and how the package is published & consumed (so you know
   where the manual must travel — module vendoring, npm `files`, Python package
   data, etc.).
