@@ -1,0 +1,89 @@
+# AI and LLM Agent Instructions for {Project Name}
+
+This document gives LLM agents and code assistants the rules, syntax, patterns,
+and known traps needed to use {Project Name} correctly on the first try.
+
+<!--
+HOW TO USE THIS TEMPLATE
+- Fill each section; delete sections that genuinely don't apply (don't leave
+  empty headers).
+- Keep it dense and concrete. Prefer a correct copy-pasteable snippet over prose.
+- Every claim here must match the code and the ground-truth spec (no drift).
+- Ship this file IN the repo, and make sure it travels with the published
+  package (module vendoring / npm "files" / Python package data / crate include).
+- Validate it with the clean-agent evaluation (see the guide's evaluation/).
+-->
+
+---
+
+## 1. Syntax / API cheat sheet
+
+{The minimum an agent needs to call the thing: the core entry points with exact
+signatures, the primary types, and the one canonical "hello world" call.}
+
+```{lang}
+{smallest complete working example — imports through a successful call}
+```
+
+---
+
+## 2. Crucial rules & constraints
+
+{Hard requirements that are not obvious from signatures. One subsection each.}
+
+### A. {Setup that must happen first}
+{e.g. encodings/handlers that must be registered before use, with the code.}
+
+### B. {Constraint}
+{...}
+
+### Traps (the places an agent will otherwise guess wrong)
+{This is the highest-value content. For each trap: the symptom, the rule, and
+the *why*. Examples of trap categories:}
+- **Argument order / signature shape.** {If functions differ, give the unifying
+  rule and tell the agent to verify signatures rather than copy from a sibling.}
+- **Concurrency.** {What is safe to call concurrently; what must not be shared.}
+- **Surprising-but-deliberate behavior.** {State it and the reasoning so the
+  agent builds the right mental model and doesn't "fix" it.}
+- **Build tags / feature flags / modes.** {Anything that changes behavior.}
+
+---
+
+## 3. Recipes (the common real-world patterns)
+
+{For each frequent pattern, a copy-pasteable, known-correct snippet. These
+prevent the agent from assembling primitives incorrectly.}
+
+### {Pattern name — e.g. "the most common record/request shape"}
+```{lang}
+{recipe}
+```
+{One line on when to use it and any caveat.}
+
+---
+
+## 4. Debugging & error diagnosis
+
+{How an agent should diagnose failures. Name the inspection/trace tools and the
+structured error types: which fields they expose (offset, location, field,
+expected-vs-actual) and how to match on them.}
+
+```{lang}
+{example: catch the typed error, read its location/field, act on it}
+```
+
+---
+
+## 5. Validation, performance modes, codegen, etc.
+
+{Any remaining capabilities an agent should know: declarative validation,
+performance/build modes, code generation, JSON/schema export. Keep each to the
+essentials + a snippet.}
+
+---
+
+## 6. Contributor note
+
+{If agents may modify this codebase, point to AGENTS.txt and state the single
+most important invariant inline (e.g. "changes must be mirrored across N code
+paths — see AGENTS.txt").}

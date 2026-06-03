@@ -1,0 +1,29 @@
+# {Project Name}
+
+> {One- or two-sentence description of what this project is and does. Write it
+> for an agent deciding whether this is the right tool and where to look next.}
+
+{Optional: one short paragraph of essential context — the single most important
+thing to know before using it.}
+
+## Docs
+
+- [Full agent manual](llms-full.txt): cheat sheet, rules, traps, recipes, debugging — read this first for code generation.
+- [README](README.md): human-oriented overview and quick start.
+- [API / reference]({link}): full reference for {types, endpoints, tags, ...}.
+- [Specification / ground truth]({link}): authoritative behavior spec.
+
+## Examples
+
+- [{Example name}]({link}): {what it shows}.
+
+## For contributors
+
+- [AGENTS.txt](AGENTS.txt): invariants and the extension checklist for agents modifying this code.
+
+<!--
+This file follows the llms.txt convention (https://llms.txt.org): an H1 title, a
+blockquote summary, then H2 sections of markdown links. Keep it short — it is an
+index, not the manual. The substance lives in llms-full.txt.
+Place this file at the repository root (and, ideally, served at /llms.txt).
+-->

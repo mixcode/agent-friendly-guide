@@ -1,0 +1,54 @@
+# Agent Instructions for Contributing to {Project Name}
+
+Read this before modifying the codebase. It lists the invariants you must
+preserve and the checklist for adding a feature correctly. (For *using* the
+library, see llms-full.txt instead.)
+
+<!--
+AGENTS.md / AGENTS.txt is an increasingly recognized convention for agent-facing
+contributor instructions — align the filename with whatever your tooling reads.
+Keep this focused on invariants and process, not API usage.
+-->
+
+## 1. Project shape
+
+{A few sentences: the module/package layout, where the core logic lives, and any
+non-obvious architecture an agent must understand before changing things.}
+
+## 2. Invariants you must not break
+
+{The rules that, if violated, produce silently-wrong results. Be explicit.
+Examples:}
+- **Parallel implementations stay in sync.** {If the same behavior is
+  implemented in N places (e.g. a reflection path, an optimized path, a code
+  generator), a change to one MUST be mirrored in all, with identical behavior.
+  List the files.}
+- **Ground truth is authoritative.** Update {SPECIFICATION.md / the ground-truth
+  doc} in the same change as any behavior change.
+- **{Other invariant}.**
+
+## 3. Build, test, and verify
+
+```bash
+{build command}
+{test command — including any alternate modes/build tags that must also pass}
+{formatter and linter commands}
+```
+
+All of the above must pass before a change is complete.
+
+## 4. Extension checklist (adding a feature/option/type)
+
+- [ ] {Parse/define the new thing in {file}}.
+- [ ] {Implement it in {path A — e.g. the default path}}.
+- [ ] {Mirror it in {path B — e.g. the optimized/codegen path}}.
+- [ ] {Wire any cross-cutting concerns (validation, context, errors)}.
+- [ ] Add tests covering {all modes / both directions}.
+- [ ] Update docs: ground-truth spec, the reference, **llms-full.txt**, and the
+      README/recipe if it's a common pattern.
+- [ ] Run the full build/test/format/lint set above.
+
+## 5. Conventions
+
+{Commit message style, doc style, naming, anything an agent should match. Keep it
+short; point to existing examples in the repo.}
