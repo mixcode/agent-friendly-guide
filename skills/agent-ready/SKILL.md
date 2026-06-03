@@ -64,29 +64,16 @@ Detect first:
   docstring), reference docs, any ground-truth/spec doc.
 - Existing agent artifacts: `llms.txt`, `llms-full.txt`, `AGENTS.txt`/`AGENTS.md`.
 
-Then score each item (✅ good / ⚠️ weak / ❌ missing) with a one-line note:
+Then score the repo against the **agent-readiness checklist**, which lives in one
+place: `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md` §3 ("The audit checklist"). **Read it
+now** and score each item ✅ good / ⚠️ weak / ❌ missing with a one-line note. Its
+groups are *Discoverability*, *Correctness & trust*, *Usability*,
+*Contributor-readiness*, and *Evidence* — use them as section headers in your
+report.
 
-**Discoverability**
-- [ ] `llms.txt` index at repo root.
-- [ ] `llms-full.txt` (or equivalent) present and complete.
-- [ ] README links the agent manual near the top.
-- [ ] In-language doc comment points to the raw manual URL.
-- [ ] The manual is included in the *published* artifact, not just the repo.
-
-**Correctness & trust**
-- [ ] The source of truth is clear (a spec doc, or the code/godoc) and the docs match it.
-- [ ] Translated/secondary docs are at parity or marked.
-- [ ] Common traps (argument order, concurrency, surprising-but-deliberate
-      behavior, modes/flags) are documented with the *why*.
-
-**Usability**
-- [ ] Copy-pasteable recipe for each common real-world pattern.
-- [ ] Errors name the location/field and expected-vs-actual.
-- [ ] Constraints validated early with clear messages.
-
-**Contributor-readiness**
-- [ ] `AGENTS.txt` lists invariants + an extension checklist.
-- [ ] Parallel implementations (if any) are called out as "keep in sync."
+Not every item applies to every repo: if the target isn't a conventional code
+library (e.g. a CLI app, a docs/methodology repo, or a plugin), mark inapplicable
+items **N/A** with a one-line reason rather than forcing a ❌.
 
 End Phase 1 with the **top 3–5 highest-leverage fixes**. If `--audit-only`, stop here.
 
@@ -164,7 +151,7 @@ run it later, and finish with the Phase-1 gap report as the backlog.
 - Full method, rationale, anti-patterns, and a worked example:
   `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md` and
   `${CLAUDE_PLUGIN_ROOT}/case-study/binarystruct.md`.
-- This skill is most useful installed as part of the `agent-friendly-guide`
-  plugin (so the templates and evaluation harness are available via
-  `${CLAUDE_PLUGIN_ROOT}`). Phase 1 (audit) still works standalone using the
-  checklist embedded above.
+- This skill must run as part of the `agent-friendly-guide` plugin: it reads the
+  checklist, templates, and evaluation harness from `${CLAUDE_PLUGIN_ROOT}`
+  (`GUIDELINE.md`, `templates/`, `evaluation/`). A standalone copy of just this
+  skill directory will not find them.

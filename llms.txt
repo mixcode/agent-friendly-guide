@@ -1,0 +1,34 @@
+# agent-friendly-guide
+
+> A practical method — and a Claude Code skill — for making codebases
+> agent-friendly: repos that LLM coding agents can use, extend, and not break.
+
+This repo is both the method and the tooling. For an agent, the **full manual is
+`GUIDELINE.md`** (there is intentionally no separate `llms-full.txt` — that would
+duplicate it); the executable form is the `agent-ready` skill, shipped as a
+Claude Code plugin.
+
+## Read first
+
+- [GUIDELINE.md](GUIDELINE.md): the full method — 7 pillars, the audit checklist
+  (the single source of truth the skill scores against), anti-patterns, and
+  language/ecosystem notes.
+- [README.md](README.md): overview, the short version, and how to install/use the skill.
+- [case-study/binarystruct.md](case-study/binarystruct.md): the worked before/after example.
+
+## The skill
+
+- [skills/agent-ready/SKILL.md](skills/agent-ready/SKILL.md): audits a repo,
+  scaffolds its agent docs, and runs a clean-agent evaluation. Install with
+  `/plugin marketplace add mixcode/agent-friendly-guide` then
+  `/plugin install agent-friendly-guide@agent-friendly-guide`.
+
+## Templates & evaluation
+
+- [templates/](templates/): fill-in skeletons (`llms.txt`, `llms-full.txt`, `AGENTS.txt`).
+- [evaluation/clean-agent-eval.md](evaluation/clean-agent-eval.md): the clean-agent evaluation harness.
+
+## For contributors
+
+- [AGENTS.txt](AGENTS.txt): invariants (GUIDELINE.md is the source of truth; the
+  checklist lives only there) and how to add a new skill.

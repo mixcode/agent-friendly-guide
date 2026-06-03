@@ -1,5 +1,9 @@
 # agent-friendly-guide
 
+> [!NOTE]
+> **AI agents**: start with [llms.txt](llms.txt); the full method/manual is
+> [GUIDELINE.md](GUIDELINE.md).
+
 A practical, reusable method for making codebases **agent-friendly** — repos that
 LLM coding agents can use, extend, and not break, without a human in the loop.
 

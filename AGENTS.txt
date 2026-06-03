@@ -1,0 +1,65 @@
+# Agent Instructions for Contributing to agent-friendly-guide
+
+Read this before modifying this repo. It documents the invariants that keep the
+method, the skill, and the templates from drifting apart. (To *use* the method,
+read GUIDELINE.md; to *run* the tooling, install the plugin and use the
+`agent-ready` skill.)
+
+## 1. Project shape
+
+This repo is both a **methodology** and a **Claude Code plugin**:
+
+- `GUIDELINE.md` — the method (7 pillars, the audit checklist, anti-patterns).
+  **This is the source of truth.**
+- `README.md` — overview, the short version, and skill install/usage.
+- `templates/` — fill-in skeletons (`llms.txt`, `llms-full.txt`, `AGENTS.txt`)
+  the skill scaffolds from.
+- `evaluation/clean-agent-eval.md` — the reusable clean-agent evaluation harness.
+- `case-study/binarystruct.md` — the worked example.
+- `skills/agent-ready/SKILL.md` — the skill that executes the method.
+- `.claude-plugin/plugin.json` + `marketplace.json` — plugin + self-marketplace
+  manifests.
+
+## 2. Invariants you must not break
+
+- **`GUIDELINE.md` is the source of truth.** `SKILL.md`, the templates, and the
+  README all *derive* from it — when the method changes, change `GUIDELINE.md`
+  and bring the others into line in the same commit.
+- **The audit checklist lives in exactly one place: `GUIDELINE.md` §3.** `SKILL.md`
+  Phase 1 *references* it (via `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md`) and must not
+  re-embed its own copy. (They drifted once; that's why this rule exists.)
+- **The skill reads bundled assets via `${CLAUDE_PLUGIN_ROOT}`** (`GUIDELINE.md`,
+  `templates/`, `evaluation/`). Keep those paths valid; the skill is not designed
+  to run as a bare standalone copy.
+- **Keep the case study honest.** `case-study/binarystruct.md` describes what
+  actually happened — don't embellish it into marketing.
+
+## 3. Verify before committing
+
+```bash
+# manifests must be valid JSON
+python3 -c "import json,glob; [json.load(open(f)) for f in glob.glob('.claude-plugin/*.json')]"
+# internal markdown links should resolve (spot-check after edits)
+```
+There is no build/test suite — this repo is docs + a skill.
+
+## 4. Extension checklist (adding a new skill)
+
+- [ ] Create `skills/<name>/SKILL.md` (frontmatter: `name`, a use-case-first
+      `description`, optional `argument-hint`). It's auto-discovered — no manifest
+      edit needed.
+- [ ] Reference shared assets via `${CLAUDE_PLUGIN_ROOT}/...`, never by copying
+      them into the skill (that would duplicate and drift).
+- [ ] Bump `version` in `.claude-plugin/plugin.json` so marketplace installs
+      fetch the change (`/plugin marketplace update` only pulls a new version).
+- [ ] Update `README.md` to list the new skill.
+
+## 5. Releasing a change
+
+Edits ship to installed users only when the plugin version is bumped:
+1. Make the change (and update derived files per §2).
+2. Bump `.claude-plugin/plugin.json` `version`.
+3. Commit and push.
+4. Users update with `/plugin marketplace update agent-friendly-guide` then
+   `/reload-plugins`. For local iteration, `claude --plugin-dir <repo>` reads
+   live files with no version bump.

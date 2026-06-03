@@ -187,16 +187,20 @@ and it pays to know which ones your toolchain hands you for free.
 A quick pass over any repo. (A fuller, tool-runnable version will live alongside
 this guide.)
 
+> This checklist is the **single source** the `agent-ready` skill scores against —
+> `SKILL.md` references it rather than keeping its own copy. Edit it here only.
+
 **Discoverability**
 - [ ] `llms.txt` index present at repo root.
 - [ ] `llms-full.txt` (or equivalent) present and complete.
 - [ ] README links the agent manual near the top.
 - [ ] In-language doc comment points to the raw manual URL.
+- [ ] The manual is included in the *published* artifact, not just the repo.
 
 **Correctness & trust**
-- [ ] A single ground-truth doc exists and matches the code.
+- [ ] The source of truth is clear (a spec doc, or the code/godoc) and the docs match it.
 - [ ] Translated/secondary docs are at parity or marked.
-- [ ] Every "common trap" is documented with the *why* and a rule.
+- [ ] Common traps (argument order, concurrency, surprising-but-deliberate behavior, modes/flags) are documented with the *why*.
 
 **Usability**
 - [ ] Copy-pasteable recipe for each common real-world pattern.
