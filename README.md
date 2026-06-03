@@ -41,7 +41,7 @@ rest.
 
 **As a plugin (recommended — bundles the templates + eval harness):**
 ```
-/plugin marketplace add <owner>/agent-friendly-guide
+/plugin marketplace add mixcode/agent-friendly-guide
 /plugin install agent-friendly-guide@agent-friendly-guide
 ```
 Local development install: `claude --plugin-dir /path/to/agent-friendly-guide`.
