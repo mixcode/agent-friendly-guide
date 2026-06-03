@@ -1,0 +1,12 @@
+{
+  "name": "agent-friendly-guide",
+  "displayName": "Agent-Friendly Guide",
+  "version": "0.1.0",
+  "description": "Make a repository agent-friendly: audit it against the agent-readiness checklist, scaffold llms.txt / llms-full.txt / AGENTS.txt, and run a clean-agent evaluation.",
+  "author": {
+    "name": "mixcode",
+    "url": "https://github.com/mixcode"
+  },
+  "license": "MIT",
+  "keywords": ["llms.txt", "agents", "agent-friendly", "documentation", "ai"]
+}

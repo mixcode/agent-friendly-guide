@@ -17,7 +17,40 @@ the result.
   harness: a reusable prompt and how to run it.
 - **[case-study/binarystruct.md](case-study/binarystruct.md)** — the before/after
   worked example.
-- *(planned)* an **Agent Skill** that runs the audit and scaffolds the artifacts.
+- **[skills/agent-ready/](skills/agent-ready/SKILL.md)** — an Agent Skill (this
+  repo is also a Claude Code plugin) that runs the audit, scaffolds the
+  artifacts, and offers the clean-agent evaluation.
+
+## The skill: `agent-ready`
+
+This repo is a Claude Code **plugin** that ships one skill, `agent-ready`. Run it
+inside any repository to make it agent-friendly:
+
+- **`/agent-ready`** — full run: audit → scaffold (`llms.txt`/`llms-full.txt`/
+  `AGENTS.txt`) → offer a clean-agent evaluation.
+- **`/agent-ready --scaffold`** — audit + scaffold, stop before the evaluation.
+- **`/agent-ready --audit-only`** — just the prioritized gap report.
+
+(When installed as a plugin the command is namespaced: `/agent-friendly-guide:agent-ready`.)
+
+The skill never fabricates API facts — it fills the templates only with what it
+can verify from the repo and leaves clearly-marked `{TODO}` placeholders for the
+rest.
+
+### Install
+
+**As a plugin (recommended — bundles the templates + eval harness):**
+```
+/plugin marketplace add <owner>/agent-friendly-guide
+/plugin install agent-friendly-guide@agent-friendly-guide
+```
+Local development install: `claude --plugin-dir /path/to/agent-friendly-guide`.
+
+**As a standalone skill** (audit works everywhere; scaffolding needs the plugin
+assets):
+```
+cp -r skills/agent-ready ~/.claude/skills/
+```
 
 ## The short version
 

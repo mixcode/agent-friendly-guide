@@ -1,0 +1,13 @@
+{
+  "name": "agent-friendly-guide",
+  "owner": {
+    "name": "mixcode"
+  },
+  "plugins": [
+    {
+      "name": "agent-friendly-guide",
+      "source": "./",
+      "description": "Make a repository agent-friendly: audit, scaffold llms.txt / llms-full.txt / AGENTS.txt, and run a clean-agent evaluation."
+    }
+  ]
+}
