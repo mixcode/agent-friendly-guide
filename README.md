@@ -16,7 +16,7 @@ the result.
 - **[GUIDELINE.md](GUIDELINE.md)** — the method: seven pillars, an audit
   checklist, anti-patterns, and language/ecosystem notes. Start here.
 - **[templates/](templates/)** — fill-in skeletons for `llms.txt`,
-  `llms-full.txt`, and `AGENTS.txt`.
+  `llms-full.txt`, `llms-full-cli.txt` (the CLI/tool-facing manual), and `AGENTS.txt`.
 - **[evaluation/](evaluation/clean-agent-eval.md)** — the clean-agent evaluation
   harness: a reusable prompt and how to run it.
 - **[case-study/binarystruct.md](case-study/binarystruct.md)** — the before/after

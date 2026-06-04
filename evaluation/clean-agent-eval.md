@@ -29,6 +29,20 @@ agent-friendliness from the inside — you know too much. This harness has a
 > if the agent rediscovers a trap you "already documented," your docs aren't
 > discoverable enough.
 
+### Discovery-only mode (for read-only / sandboxed agents)
+
+The full loop needs an agent that can **write files, compile, and execute** — not
+always possible (e.g. a sandboxed sub-agent with no write/exec). When the build
+can't run, fall back to **discovery-only**: have the fresh agent *read the
+published artifact and report first-contact friction without building it*. Tell
+it to: discover the docs as a real agent would, write the program it *would* ship
+and verify each call against the source, and log every point it had to read
+source, guess, or where a doc was missing/wrong. You lose the runtime
+verification (does it actually work?) but keep most of the **discoverability and
+selection signal**, which is what agent-readiness is really about. State in the
+report that it was discovery-only. (An A/B — one agent with your scaffolded
+manual, one without — makes the friction delta explicit.)
+
 ## The prompt (fill in the {braces})
 
 ```

@@ -84,7 +84,10 @@ Why *in the repo*: when your package is fetched (vendored into the module cache,
 cloned, installed), the agent finds the manual with a single `ls` — no network
 round-trip to a docs site, no guessing. In our case study the evaluating agent
 called this out explicitly as the single biggest reason it never had to read
-library source to make things work.
+library source to make things work. **Whether the manual actually reaches the
+consumer depends on the ecosystem's distribution model** — for some it's free,
+for others you must opt it into the package, and for some the artifact *is* the
+repo/binary; see the distribution taxonomy in §2's "languages and ecosystems."
 
 Then make it **discoverable** from the places an agent already lands:
 - A callout at the top of the README (`> [!NOTE] AI Agents: read llms-full.txt`).
@@ -151,6 +154,13 @@ Examples from the case study:
 Rule of thumb: if a competent engineer could plausibly write the wrong call from
 the signature alone, that is a trap — document it.
 
+Some traps are **ecosystem-idiomatic** and worth checking for by language — e.g.
+single-header `#define IMPLEMENTATION`-in-one-TU rules and inverted return codes
+(C), feature-gated APIs that vanish under `--no-default-features` (Rust), static
+`from()` factories instead of constructors (JVM), results returned on stdout with
+status via exit codes (Shell), an install command in the README that doesn't
+match the real filename/manifest (any). See §2's per-ecosystem table.
+
 ### Pillar 4 — Recipes for the common path
 
 For the few patterns that cover most real usage, give a **copy-pasteable** recipe
@@ -209,19 +219,57 @@ the next improvement. Treat the friction log as your backlog.
 ### A note on languages and ecosystems
 
 The pillars are language-agnostic, but the **cost** of each varies by ecosystem,
-and it pays to know which ones your toolchain hands you for free.
+and it pays to know which ones your toolchain hands you for free. Two things vary
+the most: **where the manual must live so it reaches the consumer** (the
+distribution model, below) and **which in-language surface the pointer goes in**
+(the doc surface, in the table below). Validated across Go, Python, JS/TS, C,
+Rust, JVM, Shell, and Swift.
 
-- **Go is unusually well-suited** to this work: `gofmt` gives consistent style,
-  `go vet` catches a class of misuse, `doc.go` / `go doc` provide an in-language
-  manual surface, module vendoring means `llms-full.txt` ships *with* the package
-  into the consumer's module cache, and pkg.go.dev renders docs automatically.
-  Several pillars are nearly free.
-- **Other ecosystems need explicit equivalents.** Wire a formatter + linter into
-  CI (pillar 2's drift defense); pick the in-language doc surface for the pointer
-  to `llms-full.txt` (a module/package docstring, or a packaged README); and —
-  easy to miss — make sure the manual is **included in the published artifact**
-  so it travels with installs (npm `files`, Python package data / `MANIFEST.in`,
-  a crate's `include`, etc.), not just present in the git repo.
+#### The distribution model decides where the manual lives ("does the manual travel?")
+
+This is the single most ecosystem-divergent question. There are four models —
+identify which one the repo is in, then apply its fix:
+
+- **Model A — central registry, ships *all* files by default.** Go (module
+  cache), Rust (crates.io), Swift (SwiftPM resolves the full git checkout).
+  `llms-full.txt` travels **for free** from the repo root. *Caveat:* Rust silently
+  opts **out** if `Cargo.toml` sets `include = [...]` — check for it.
+- **Model B — central registry, opt-in allowlist.** Python wheel, npm, JVM JAR.
+  A root file is **not** shipped unless you add it: Python `package_data` /
+  `MANIFEST.in`, npm `package.json` `files`, JVM `src/main/resources` (and note
+  Maven also publishes a separate `-javadoc` jar agents read via javadoc.io).
+- **Model C — no registry; consumed by git URL.** SwiftPM, Go modules, Zig, Mint.
+  There is no one-word `install <name>` — the consumer references a **git URL +
+  tag**; the manual travels with the resolved checkout (document the URL form).
+- **Model D — no package; the repo / a built binary / a single file IS the
+  artifact.** C (vendored header or a compiled binary), unpackaged scripts
+  (Python/Shell), Bun-compiled or other prebuilt-binary CLIs, JVM application
+  distributions (launcher + jars; deb/rpm/Docker/Homebrew). Registry-bundling is
+  **N/A** — ship the manual **in the repo, the in-file doc comment, man pages,
+  and/or release assets**. *Sub-split:* vendoring the **whole repo/dir** (git
+  submodule, module cache) carries the manual along; **copying a single file** (a
+  single-header C lib, one `.sh`) does **not** — so for those, put the pointer and
+  the key traps **inside the file itself**.
+
+#### Per-ecosystem quick reference
+
+| Ecosystem | Type/manifest signals | Doc surface (+ renderer) | Distribution model & manual fix |
+| :-- | :-- | :-- | :-- |
+| **Go** | `go.mod`; `cmd/` or `main` = CLI | `doc.go` / `go doc` (pkg.go.dev) | A — free from repo root |
+| **Rust** | `Cargo.toml`; `[[bin]]`/`src/main.rs` = CLI; `src/lib.rs` = lib | rustdoc `//!`/`///` (docs.rs) | A — free **unless `include` set**; feature-gated APIs change with `--no-default-features` |
+| **Swift** | `Package.swift`; `.library` vs `.executable` | DocC `///` (Swift Package Index) | A/C — git-URL, resolved checkout carries it; `@dynamicCallable` has no enumerable API surface |
+| **Python** | `pyproject.toml`*/`setup.py`; CLI = `console_scripts`/`__main__`+argparse | `__init__.py` docstring; CLI = `--help` | B — add `package_data`/`MANIFEST.in`; *or D if unpackaged*. *`pyproject` may be tool-config only — check for `[project]`/`[build-system]` |
+| **JS/TS** | `package.json`; `bin` = CLI; `exports`/`main` = lib | JSDoc/TSDoc; CLI = `--help` | B — add to `files`; *or D if Bun/Deno-compiled to a binary* |
+| **JVM** | `pom.xml` / `build.gradle(.kts)`; `.library` vs app-plugin | `package-info.java` + Javadoc (javadoc.io) | B — `src/main/resources` and/or the `-javadoc` jar; CLI app-dist is D; static `from()` factories are a common trap |
+| **C** | `Makefile`/`CMakeLists.txt`; headers + `.a`/`.so`; `main`+getopt = CLI | header top-comment; `usage()`; man pages | D — header/binary is the artifact; **single-header ⇒ put manual pointer + traps in the header**; man pages for installed CLIs |
+| **Shell** | no manifest — `.sh`/`.bash`, shebang, `bin/`, sourced-funcs vs `main` | SHDOC comments (+ generated README); `--help`; man | D — vendored repo carries it; a copied single `.sh` does not; results on stdout + status via exit codes (document `@exitcode`) |
+
+#### Other cross-cutting notes
+
+- **Wire a formatter + linter into CI** (pillar 2's drift defense) in any
+  ecosystem that doesn't hand you one (`gofmt`/`go vet` are Go-only freebies).
+- **The README isn't always at the repo root** (e.g. `.github/README.md`,
+  `docs/`) — check there before concluding it's missing.
 - **The clean-agent evaluation (pillar 7) is the equalizer.** It surfaces
   ecosystem-specific gaps — "the manual wasn't in the installed package," "there
   was no formatter so a generated change looked malformed" — regardless of
@@ -240,12 +288,13 @@ checklist automatically (see the README to install it).
 **Discoverability**
 - [ ] `llms.txt` index present at repo root.
 - [ ] `llms-full.txt` (or equivalent) present and complete.
-- [ ] README links the agent manual near the top.
-- [ ] In-language doc comment points to the raw manual URL.
-- [ ] The manual is included in the *published* artifact, not just the repo.
+- [ ] README links the agent manual near the top (check non-root locations too: `.github/`, `docs/`).
+- [ ] In-language doc comment points to the raw manual URL (use the ecosystem's doc surface — see §2's per-ecosystem table).
+- [ ] **The manual reaches the consumer per the repo's distribution model** (§2): for a registry **opt-in allowlist** (B) it's added (`package_data`/`MANIFEST.in`, npm `files`, JVM resources/`-javadoc` jar); for **ships-all** (A) it's at the repo root (and not excluded by Rust `include`); when the **artifact is the repo/binary/single file** (D) it's shipped in-repo + in the in-file doc comment + man/release assets, and registry-bundling is marked **N/A** — for a single copied file (single-header C, one `.sh`) the pointer and key traps live *inside the file*.
 
 **Correctness & trust**
 - [ ] The source of truth is clear (a spec doc, or the code/godoc) and the docs match it.
+- [ ] README/quick-start **claims and install/source commands match the manifest, code, and real filenames** (no advertised-capability or install-path drift).
 - [ ] Translated/secondary docs are at parity or marked.
 - [ ] Common traps (argument order, concurrency, surprising-but-deliberate behavior, modes/flags) are documented with the *why*.
 

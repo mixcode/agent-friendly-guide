@@ -60,10 +60,15 @@ Detect first:
 - **Repo type** — how an agent consumes it. State which it is and the signals you
   used:
   - **CLI tool** — a `bin`/`cmd/` dir, a `main` that parses flags/subcommands
-    (cobra/clap/argparse), or a `package.json` `bin` / Python `console_scripts`.
+    (cobra/clap/argparse/picocli/SwiftCLI/ArgumentParser), or a `package.json`
+    `bin` / Python `console_scripts` / Cargo `[[bin]]` / a shell `bin/` of
+    scripts.
   - **MCP server** — a `.mcp.json`, MCP SDK imports
-    (`@modelcontextprotocol/sdk`, the `mcp` Python pkg), or code registering tools.
-  - **Library / API** — exported API, no `main` / no CLI entry point.
+    (`@modelcontextprotocol/sdk`, the `mcp`/`fastmcp` Python pkg), or code
+    registering tools.
+  - **Library / API** — exported API, no `main` / no CLI entry point (Cargo
+    `src/lib.rs`, Package.swift `.library`, a JVM jar with no app entry, an
+    importable package, a sourced-functions shell lib).
   - **Plugin / skill** — a `SKILL.md` or `.claude-plugin/plugin.json`.
   - **Docs / methodology** — mostly Markdown, no package to install.
   A repo can be more than one (e.g. a library that also ships a CLI) — note both.
@@ -73,12 +78,27 @@ Detect first:
   `*.md`, `SKILL.md`, and `templates/` from marker greps (e.g. a file that
   mentions `modelcontextprotocol` to *explain* MCP detection is not an MCP
   server). When unsure, confirm the signal's source before classifying.
-- Language/ecosystem and how the package is published & consumed (so you know
-  where the manual must travel — module vendoring, npm `files`, Python package
-  data, etc.).
-- Entry-point docs: README, in-language doc surface (e.g. Go `doc.go`, module
-  docstring), reference docs, any ground-truth/spec doc.
-- Existing agent artifacts: `llms.txt`, `llms-full.txt`, `AGENTS.txt`/`AGENTS.md`.
+  **Know each ecosystem's manifest** — `go.mod`, `Cargo.toml`, `package.json`,
+  `pyproject.toml`/`setup.py`, **`pom.xml`/`build.gradle(.kts)`**,
+  **`Package.swift`**, `Makefile`/`CMakeLists.txt` — and **verify its role, don't
+  just key on presence**: a `pyproject.toml` may be tool-config only (check for a
+  `[project]`/`[build-system]` table), a `package.json` may target Bun/Deno, a
+  `bin` field may be `null`. **Shell has no manifest** — use `.sh`/`.bash` files,
+  shebangs, a `bin/` dir, and sourced-functions-vs-`main` shape.
+- Language/ecosystem and its **distribution model** — which of the four in
+  GUIDELINE §2 ("languages and ecosystems") the repo is in (A ships-all / B
+  opt-in allowlist / C git-URL / D repo-binary-file-is-the-artifact). This tells
+  you where the manual must live so it reaches the consumer.
+- Entry-point docs: README (also check non-root locations — `.github/README.md`,
+  `docs/`), the ecosystem's in-language doc surface (see the §2 per-ecosystem
+  table — e.g. Go `doc.go`, Rust rustdoc, JVM `package-info.java`/Javadoc, Swift
+  DocC, Python `__init__.py` docstring, a C header top-comment, shell SHDOC),
+  reference docs, any ground-truth/spec doc.
+- Existing agent artifacts: `llms.txt`, `llms-full.txt`, `AGENTS.txt`/`AGENTS.md`,
+  and other agent-facing docs — **`CLAUDE.md`, `.cursorrules`,
+  `.github/copilot-instructions.md`**. If a contributor-agent doc already exists,
+  **align with / point to it rather than authoring a duplicate `AGENTS.txt`** that
+  will drift from it.
 
 Then score the repo against the **agent-readiness checklist**, which lives in one
 place: `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md` §3 ("The audit checklist"). **Read it
@@ -114,27 +134,38 @@ there is one authority and the rest derive from it:
   enough that it isn't self-evident from the code (flag it; don't auto-create).
 
 Then generate or update the agent artifacts from the templates in
-`${CLAUDE_PLUGIN_ROOT}/templates/` (`llms.txt`, `llms-full.txt`, `AGENTS.txt`).
-For each:
+`${CLAUDE_PLUGIN_ROOT}/templates/` (`llms.txt`, `llms-full.txt`, `AGENTS.txt`;
+plus `llms-full-cli.txt` for a CLI/tool — see below). For each:
 
 1. Read the template.
 2. Fill every section you can from verified repo facts; leave `{TODO: ...}`
    placeholders for anything you can't confirm (especially the traps and
    recipes — those need real API knowledge).
-3. Write the file at the repo root (confirm first if it already exists). For
-   files that already exist (README, the doc surface), make **additive** edits —
-   insert a callout/pointer and show what changed; never silently rewrite them.
+3. Write the file at the repo root (confirm first if it already exists), then
+   **make it reach the consumer per the distribution model** (Phase 1 / GUIDELINE
+   §2): for an **opt-in allowlist** (B) add it to `package_data`/`MANIFEST.in` /
+   npm `files` / JVM resources; for a **single copied file** (D: single-header C,
+   one `.sh`) put the pointer **and the key traps inside that file**, since a
+   separate `llms-full.txt` won't travel with it. For files that already exist
+   (README, the doc surface), make **additive** edits — insert a callout/pointer
+   and show what changed; never silently rewrite them, and **never edit inside a
+   generated region** (e.g. a SHDOC-generated README, a `<!-- generated -->`
+   block) — put the callout in a hand-maintained section or the generator's source.
 
 **Match the manual to the repo type** (from Phase 1). For a **CLI or MCP server**,
-the manual is tool-facing, not an API cheat sheet — lead with the **selection
-surface** ("use when / not for"), then the **invocation contract** (commands/flags
-or tool name + input schema, auth/env), then **output and error legibility** and
-which operations mutate state. For a **library**, the API cheat sheet + recipes
-lead. (No dedicated tool-card template yet — fill `llms-full.txt` tool-style.)
+the manual is tool-facing, not an API cheat sheet — start from the
+`llms-full-cli.txt` template and lead with the **selection surface** ("use when /
+not for"), then the **invocation contract** (commands/flags or tool name + input
+schema, auth/env), then **output and error legibility** and which operations
+mutate state. For a **library**, use `llms-full.txt` — the API cheat sheet +
+recipes lead.
 
 Then wire **discoverability** (the cheapest, highest-return fixes):
-- Add a short callout near the top of the README pointing to `llms-full.txt`.
-- Add a one-line pointer in the in-language doc surface to the raw manual URL.
+- Add a short callout near the top of the README pointing to `llms-full.txt`
+  (in a hand-edited region, not a generated one; if the README lives in
+  `.github/`, edit it there).
+- Add a one-line pointer in the ecosystem's in-language doc surface to the raw
+  manual URL (see GUIDELINE §2's per-ecosystem table for which surface).
 
 If the audit found a clear "common pattern," draft a copy-pasteable **recipe**
 for it (or a `{TODO}` recipe stub if you can't verify the API).

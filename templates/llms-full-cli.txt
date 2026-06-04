@@ -1,0 +1,105 @@
+# AI and LLM Agent Instructions for {Tool Name}
+
+This document gives LLM agents the selection surface, invocation contract, output
+behavior, and known traps needed to drive {Tool Name} correctly on the first try.
+It is a **CLI tool** (consumed by *invoking commands*), not an importable library.
+
+> **Source of truth:** {the argument/command definitions in {file}, and the
+> README / `--help`}. This manual is *derived* — if they disagree, the code wins,
+> and `{tool} --help` is authoritative for flags.
+
+<!--
+HOW TO USE THIS TEMPLATE (CLI / tool-facing manual)
+- This is the tool-facing counterpart to llms-full.txt. Lead with SELECTION
+  (use when / not for) and the INVOCATION CONTRACT, not an API cheat sheet.
+- Fill each section from verified facts; delete genuinely-inapplicable ones.
+- Ship it so it reaches the consumer per the repo's distribution model
+  (GUIDELINE §2): packaged-allowlist → add it; binary/repo-is-the-artifact →
+  keep it in the repo + release assets and point to it from the README/--help.
+- For an MCP server, the real "manual" is largely the in-protocol tools/list
+  (descriptions + input schemas + annotations); make those complete, and use the
+  sections below for the server's setup/auth and selection surface.
+-->
+
+---
+
+## 1. Selection surface — use when / not for
+
+- **Use when:** {the one-line job this tool is for, phrased the way an agent would
+  describe the task.}
+- **Also does:** {secondary capabilities / subcommands, if any.}
+- **Not for:** {scope limits and the jobs it should NOT be picked for — prevents
+  misuse as much as non-use.}
+
+---
+
+## 2. Invocation contract
+
+{How it is installed/obtained — name the distribution model: a registry install
+(`npm i -g {pkg}` / `pipx install {pkg}` / `cargo install {crate}`), a git-URL /
+`go install`, or a prebuilt binary / Homebrew / Docker / build-from-source. State
+plainly if there is NO one-word install.}
+
+```sh
+{tool} {command} [options] [args]
+{tool} --help
+{tool} --version
+```
+
+| Command / subcommand | What it does | Mutates? |
+| :-- | :-- | :-- |
+| `{command}` | {one line} | {read-only / writes / destructive} |
+
+Key options (see `--help` for the authoritative list and defaults):
+{`--flag <arg>` — meaning + default; group mutually-exclusive flags; note any
+required argument or precedence between input sources (e.g. `--input` > FILE > STDIN).}
+
+---
+
+## 3. Auth / environment prerequisites (headless use)
+
+{What must be set up for a non-interactive run: env vars, config files, tokens,
+OAuth, a reachable service. Call out anything that PROMPTS interactively (a
+password, a 2FA step, a picker) and the flag(s) that make it run unattended.}
+
+---
+
+## 4. Output, errors, and side effects
+
+- **Output:** {is there a `--json`/quiet/stable-format mode? Is it on every
+  command or only some? If output is human-formatted only, say so and name the
+  machine-readable path (a log file, a report artifact).}
+- **Exit codes:** {what 0 / non-zero mean; specific codes worth matching on.}
+- **Side effects:** {which commands are read-only vs mutating; what is
+  written/where; is there a `--dry-run` for destructive ones?}
+
+---
+
+## 5. Traps (where an agent will otherwise guess wrong)
+
+{The highest-value content — each as symptom + rule + why. Common CLI traps:}
+- **Install/invocation:** {no registry install; wrong runtime; subcommands vs
+  separate binaries; the README's install command not matching reality.}
+- **Interactive-by-default:** {it blocks on a prompt unless `--flag` is passed.}
+- **Argument syntax / precedence:** {non-obvious value typing, reference syntax,
+  source precedence.}
+- **Capability gaps:** {advertised features that are partial — e.g. `--json` only
+  on some commands.}
+
+---
+
+## 6. Recipe (the common real-world invocation)
+
+```sh
+{a copy-pasteable, known-correct invocation for the most common task, including
+the flags needed for headless/non-interactive use}
+```
+{One line on when to use it and any caveat.}
+
+---
+
+## 7. Contributor note
+
+{If agents may modify this tool, point to AGENTS.txt and state the single most
+important invariant inline (e.g. "every flag must appear in `--help` and this
+manual"; "keep read-only vs mutating commands on the correct side").}
