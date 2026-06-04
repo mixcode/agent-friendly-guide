@@ -1,5 +1,8 @@
 # agent-friendly-guide
 
+[![Agent-Ready](https://img.shields.io/badge/Agent--Ready-passed-success)](GUIDELINE.md)
+[![llms.txt](https://img.shields.io/badge/llms.txt-compliant-blue)](llms.txt)
+
 > [!NOTE]
 > **AI agents**: start with [llms.txt](llms.txt); the full method/manual is
 > [GUIDELINE.md](GUIDELINE.md).
