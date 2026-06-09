@@ -10,11 +10,13 @@ Claude Code plugin.
 
 ## Read first
 
-- [GUIDELINE.md](GUIDELINE.md): the full method — 7 pillars, the audit checklist
+- [GUIDELINE.md](GUIDELINE.md): the full method — 7 principles, the audit checklist
   (the single source of truth the skill scores against), anti-patterns, and
   language/ecosystem notes.
 - [README.md](README.md): overview, the short version, and how to install/use the skill.
-- [case-study/binarystruct.md](case-study/binarystruct.md): the worked before/after example.
+- [languages/](languages/): per-ecosystem specifics (signals, doc surface,
+  distribution model, traps) — `go`, `python`, `javascript`, `c`, `rust`, `jvm`,
+  `shell`, `swift`.
 
 ## The skill
 

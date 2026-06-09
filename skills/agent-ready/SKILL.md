@@ -1,7 +1,7 @@
 ---
 name: agent-ready
 description: Make a repository agent-friendly. Audits the current repo against the agent-readiness checklist, scaffolds an agent manual (llms.txt / llms-full.txt) and a contributor guide (AGENTS.txt), and offers a clean-agent evaluation. Use when asked to make a repo or library agent-friendly or LLM-friendly, to add llms.txt / llms-full.txt / AGENTS.txt, to write an agent manual, or to assess how easily an AI agent can use a codebase. Not for general code review or bug-hunting, writing application/runtime code, or authoring docs unrelated to agent-readiness.
-argument-hint: "[--audit-only | --scaffold]"
+argument-hint: "[--full | --audit-only | --scaffold]"
 ---
 
 # agent-ready
@@ -22,12 +22,12 @@ line). Decide which repo to work on, in this order:
 
 ## Modes
 
-The arguments may include a mode switch. Pick the stopping point; default to the
-full run when no switch is present:
+The arguments may include a mode switch. Pick the stopping point:
 
 - **`--audit-only`** → run Phase 1 only, then stop.
 - **`--scaffold`** → run Phases 1–2, then stop (do not offer the evaluation).
-- **(no switch)** → full run: Phases 1–3.
+- **`--full`** → full run: Phases 1–3. **This is the default** — also used when no
+  switch is given.
 
 State the target repo and the mode in one line before you start.
 
@@ -85,15 +85,18 @@ Detect first:
   `[project]`/`[build-system]` table), a `package.json` may target Bun/Deno, a
   `bin` field may be `null`. **Shell has no manifest** — use `.sh`/`.bash` files,
   shebangs, a `bin/` dir, and sourced-functions-vs-`main` shape.
-- Language/ecosystem and its **distribution model** — which of the four in
-  GUIDELINE §2 ("languages and ecosystems") the repo is in (A ships-all / B
-  opt-in allowlist / C git-URL / D repo-binary-file-is-the-artifact). This tells
-  you where the manual must live so it reaches the consumer.
+- Language/ecosystem. **Read `${CLAUDE_PLUGIN_ROOT}/languages/<lang>.md`** if it
+  exists (`go`, `python`, `javascript`, `c`, `rust`, `jvm`, `shell`, `swift`) — it
+  gives that ecosystem's detection signals, doc surface, distribution model, and
+  traps. If there's no file for the language, fall back to the agnostic guidance
+  and the **distribution model** taxonomy in GUIDELINE §2 (A ships-all / B opt-in
+  allowlist / C git-URL / D repo-binary-file-is-the-artifact) — this tells you
+  where the manual must live to reach the consumer.
 - Entry-point docs: README (also check non-root locations — `.github/README.md`,
-  `docs/`), the ecosystem's in-language doc surface (see the §2 per-ecosystem
-  table — e.g. Go `doc.go`, Rust rustdoc, JVM `package-info.java`/Javadoc, Swift
-  DocC, Python `__init__.py` docstring, a C header top-comment, shell SHDOC),
-  reference docs, any ground-truth/spec doc.
+  `docs/`), the ecosystem's in-language doc surface (named in
+  `languages/<lang>.md` — e.g. Go `doc.go`, Rust rustdoc, JVM `package-info.java`/
+  Javadoc, Swift DocC, Python `__init__.py` docstring, a C header top-comment,
+  shell SHDOC), reference docs, any ground-truth/spec doc.
 - Existing agent artifacts: `llms.txt`, `llms-full.txt`, `AGENTS.txt`/`AGENTS.md`,
   and other agent-facing docs — **`CLAUDE.md`, `.cursorrules`,
   `.github/copilot-instructions.md`**. If a contributor-agent doc already exists,
@@ -165,7 +168,7 @@ Then wire **discoverability** (the cheapest, highest-return fixes):
   (in a hand-edited region, not a generated one; if the README lives in
   `.github/`, edit it there).
 - Add a one-line pointer in the ecosystem's in-language doc surface to the raw
-  manual URL (see GUIDELINE §2's per-ecosystem table for which surface).
+  manual URL (see `languages/<lang>.md` for which surface).
 
 If the audit found a clear "common pattern," draft a copy-pasteable **recipe**
 for it (or a `{TODO}` recipe stub if you can't verify the API).
@@ -206,9 +209,8 @@ run it later, and finish with the Phase-1 gap report as the backlog.
 
 ## Notes
 
-- Full method, rationale, anti-patterns, and a worked example:
-  `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md` and
-  `${CLAUDE_PLUGIN_ROOT}/case-study/binarystruct.md`.
+- Full method, rationale, and anti-patterns: `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md`.
+  Per-language specifics: `${CLAUDE_PLUGIN_ROOT}/languages/<lang>.md`.
 - This skill must run as part of the `agent-friendly-guide` plugin: it reads the
   checklist, templates, and evaluation harness from `${CLAUDE_PLUGIN_ROOT}`
   (`GUIDELINE.md`, `templates/`, `evaluation/`). A standalone copy of just this

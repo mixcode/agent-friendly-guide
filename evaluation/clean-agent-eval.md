@@ -1,6 +1,6 @@
 # The Clean-Agent Evaluation
 
-The feedback loop of the method (pillar 7). You cannot judge your own repo's
+The feedback loop of the method (principle 7). You cannot judge your own repo's
 agent-friendliness from the inside — you know too much. This harness has a
 **fresh agent**, with no prior context, build something real using only your
 **published** artifacts, and report exactly where it struggled.
@@ -103,9 +103,8 @@ reduced friction. Include paths to the code and the report.
 ## Reading the result
 
 - A **high rating with a specific gap** is the ideal outcome — it both validates
-  the work and hands you the next task. (In the binarystruct case study the eval
-  scored 5/5 *and* surfaced a missing fixed/magic-value feature, which became the
-  next release.)
+  the work and hands you the next task. (In practice an eval has scored highly
+  *and* surfaced a concrete missing feature that became the next release.)
 - If the agent **re-derived a trap you thought was documented**, the doc exists
   but isn't discoverable — fix placement, not content.
 - If it **read your source to make things work** (not just to double-check), a

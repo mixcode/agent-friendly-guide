@@ -10,20 +10,20 @@
 A practical, reusable method for making codebases **agent-friendly** — repos that
 LLM coding agents can use, extend, and not break, without a human in the loop.
 
-It is distilled from a real conversion (the `github.com/mixcode/binarystruct` Go
-library) and validated by having a fresh agent build a non-trivial tool against
-the result.
+It is distilled from real-world conversions of production libraries and CLI
+tools, validated by having fresh agents build non-trivial things against the
+results, and tested across eight language ecosystems.
 
 ## Contents
 
-- **[GUIDELINE.md](GUIDELINE.md)** — the method: seven pillars, an audit
+- **[GUIDELINE.md](GUIDELINE.md)** — the method: seven principles, an audit
   checklist, anti-patterns, and language/ecosystem notes. Start here.
 - **[templates/](templates/)** — fill-in skeletons for `llms.txt`,
   `llms-full.txt`, `llms-full-cli.txt` (the CLI/tool-facing manual), and `AGENTS.txt`.
 - **[evaluation/](evaluation/clean-agent-eval.md)** — the clean-agent evaluation
   harness: a reusable prompt and how to run it.
-- **[case-study/binarystruct.md](case-study/binarystruct.md)** — the before/after
-  worked example.
+- **[languages/](languages/)** — per-ecosystem specifics (signals, doc surface,
+  distribution model, traps) for Go, Python, JavaScript, C, Rust, JVM, Shell, Swift.
 - **[skills/agent-ready/](skills/agent-ready/SKILL.md)** — an Agent Skill (this
   repo is also a Claude Code plugin) that runs the audit, scaffolds the
   artifacts, and offers the clean-agent evaluation.
@@ -33,8 +33,9 @@ the result.
 This repo is a Claude Code **plugin** that ships one skill, `agent-ready`. Run it
 inside any repository to make it agent-friendly:
 
-- **`/agent-ready`** — full run: audit → scaffold (`llms.txt`/`llms-full.txt`/
-  `AGENTS.txt`) → offer a clean-agent evaluation.
+- **`/agent-ready`** (or `--full`) — full run: audit → scaffold
+  (`llms.txt`/`llms-full.txt`/`AGENTS.txt`) → offer a clean-agent evaluation.
+  `--full` is the default when no switch is given.
 - **`/agent-ready --scaffold`** — audit + scaffold, stop before the evaluation.
 - **`/agent-ready --audit-only`** — just the prioritized gap report.
 

@@ -9,13 +9,14 @@ read GUIDELINE.md; to *run* the tooling, install the plugin and use the
 
 This repo is both a **methodology** and a **Claude Code plugin**:
 
-- `GUIDELINE.md` — the method (7 pillars, the audit checklist, anti-patterns).
+- `GUIDELINE.md` — the method (7 principles, the audit checklist, anti-patterns).
   **This is the source of truth.**
 - `README.md` — overview, the short version, and skill install/usage.
 - `templates/` — fill-in skeletons (`llms.txt`, `llms-full.txt`, `AGENTS.txt`)
   the skill scaffolds from.
 - `evaluation/clean-agent-eval.md` — the reusable clean-agent evaluation harness.
-- `case-study/binarystruct.md` — the worked example.
+- `languages/<lang>.md` — per-ecosystem specifics (signals, doc surface,
+  distribution model, traps) the skill loads after detecting the language.
 - `skills/agent-ready/SKILL.md` — the skill that executes the method.
 - `.claude-plugin/plugin.json` + `marketplace.json` — plugin + self-marketplace
   manifests.
@@ -31,8 +32,11 @@ This repo is both a **methodology** and a **Claude Code plugin**:
 - **The skill reads bundled assets via `${CLAUDE_PLUGIN_ROOT}`** (`GUIDELINE.md`,
   `templates/`, `evaluation/`). Keep those paths valid; the skill is not designed
   to run as a bare standalone copy.
-- **Keep the case study honest.** `case-study/binarystruct.md` describes what
-  actually happened — don't embellish it into marketing.
+- **Keep examples language-agnostic; never name or link a real external repo** in
+  the guide, skill, or templates. A skill-running agent will fetch and read any
+  named project, wasting effort on something the abstract rule already teaches.
+  Illustrate with abstract descriptions; real per-language specifics belong in
+  `languages/<lang>.md`.
 
 ## 3. Verify before committing
 

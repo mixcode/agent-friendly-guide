@@ -1,9 +1,9 @@
 # Making a Codebase Agent-Friendly
 
 A practical method for turning a repository into one that LLM coding agents can
-use, extend, and not break — derived from a real conversion of a Go library
-(`github.com/mixcode/binarystruct`) and the friction a fresh agent hit while
-building a non-trivial tool against it.
+use, extend, and not break — derived from real conversions of production
+libraries and CLI tools, and the friction fresh agents hit while building
+non-trivial things against them.
 
 > The premise: a growing share of your docs are now read by machines, not just
 > people. An agent-friendly repo is not "docs with more keywords" — it is a repo
@@ -25,13 +25,13 @@ Two audiences you are writing for, and they need different things:
 
 And two levels of effort, with very different payoff curves:
 
-- **Doc-level** (pillars 1–4, 6): cheap, applies to any repo, large immediate
+- **Doc-level** (principles 1–4, 6): cheap, applies to any repo, large immediate
   return. Start here.
-- **Design-level** (pillar 5): changing the API/code itself so it is hard to
+- **Design-level** (principle 5): changing the API/code itself so it is hard to
   misuse. Higher effort, highest ceiling. This is where "agent-friendly" stops
   being about documentation.
 
-The feedback loop (pillar 7) is what tells you when you're done.
+The feedback loop (principle 7) is what tells you when you're done.
 
 ### Repo types — what "consume" means
 
@@ -60,15 +60,15 @@ Cutting across every type, an agent must do three things — make each easy:
   underweighted dimension, and it is exactly what tool use hinges on.
 - **Use** — invoke it correctly the first time (traps, recipes, error legibility).
 
-The seven pillars serve all three; **find** and **select** both live in pillar 1.
+The seven principles serve all three; **find** and **select** both live in principle 1.
 
 ---
 
-## 2. The method — seven pillars
+## 2. The method — seven principles
 
-### Pillar 1 — Find & select: an entry point an agent can reach and choose
+### Principle 1 — Find & select: an entry point an agent can reach and choose
 
-This pillar covers the first two of find/select/use. **Find** is discoverability —
+This principle covers the first two of find/select/use. **Find** is discoverability —
 the machine-readable entry point below. **Select** is the *selection surface* — how
 the agent decides this is the right thing for the job.
 
@@ -77,12 +77,12 @@ Ship a dedicated agent manual **inside the repo**, not only on a docs site.
 - `llms.txt` — a short index page (the emerging convention; see https://llms.txt.org)
   pointing at the deeper docs.
 - `llms-full.txt` — the full manual: a syntax/API cheat sheet, the crucial rules
-  and constraints, the documented traps (pillar 3), copy-pasteable recipes
-  (pillar 4), debugging guidance, and error diagnosis.
+  and constraints, the documented traps (principle 3), copy-pasteable recipes
+  (principle 4), debugging guidance, and error diagnosis.
 
 Why *in the repo*: when your package is fetched (vendored into the module cache,
 cloned, installed), the agent finds the manual with a single `ls` — no network
-round-trip to a docs site, no guessing. In our case study the evaluating agent
+round-trip to a docs site, no guessing. In testing, the evaluating agent
 called this out explicitly as the single biggest reason it never had to read
 library source to make things work. **Whether the manual actually reaches the
 consumer depends on the ecosystem's distribution model** — for some it's free,
@@ -112,7 +112,7 @@ the agent chooses among many at invocation time. Worked example: the `agent-read
 skill's `description` — verb-first, with the trigger phrases an agent would think
 in ("make a repo agent-friendly", "add llms.txt").
 
-### Pillar 2 — One source of truth, zero drift
+### Principle 2 — One source of truth, zero drift
 
 Designate one **ground truth** for behavior and make every other doc agree with
 it. Drift is worse than missing docs: an agent that trusts a confident-but-wrong
@@ -120,12 +120,13 @@ statement fails in ways that are hard to debug.
 
 Ground truth is usually **the code and its in-language docs (godoc/docstrings)** —
 for a simple library that *is* the authority, and the agent manual derives from
-it. Reach for a dedicated spec document (we used `SPECIFICATION.md`) only when
-behavior is complex enough that it isn't self-evident from the code (binarystruct
-earned one: a tag grammar plus three parallel execution paths). Don't add a
-parallel spec to a simple project — it just becomes one more thing to drift. When
-in doubt, name the authority in the manual ("if the docs and code disagree, the
-code wins") rather than creating a new document.
+it. Reach for a dedicated spec document (e.g. a `SPECIFICATION.md`) only when
+behavior is complex enough that it isn't self-evident from the code — for
+example, a library with a custom tag/DSL grammar plus several parallel execution
+paths that must stay in lockstep earns one. Don't add a parallel spec to a simple
+project — it just becomes one more thing to drift. When in doubt, name the
+authority in the manual ("if the docs and code disagree, the code wins") rather
+than creating a new document.
 
 - When you change behavior, update ground truth in the same change.
 - Periodically diff docs against code. (In our conversion this caught a
@@ -134,17 +135,17 @@ code wins") rather than creating a new document.
 - If you maintain translated docs, keep them at parity or mark them as possibly
   stale; a half-updated translation is a drift source.
 
-### Pillar 3 — Name the traps; don't hide them
+### Principle 3 — Name the traps; don't hide them
 
 Every API has sharp edges. The agent-friendly move is to **document the sharp
 edge with the *why* and a rule**, not to pretend it isn't there (and not always
 to "fix" it — a breaking change can be worse than a documented wart).
 
-Examples from the case study:
-- **Inconsistent argument order** across functions — we did *not* reorder
-  (breaking change); we documented the trap with a unifying rule ("stream first,
-  then order, then value; the value-first variant has no stream"). The eval
-  agent confirmed this single paragraph stopped it from writing the wrong call.
+Examples:
+- **Inconsistent argument order** across functions — prefer documenting the trap
+  with a unifying rule over a breaking reorder (e.g. "stream first, then order,
+  then value; the value-first variant has no stream"). One clear paragraph can
+  stop an agent from writing the wrong call.
 - **Concurrency**: which entry points are safe to call concurrently, and the one
   object you must not share across goroutines.
 - **Surprising-but-deliberate semantics** (e.g. an encode that intentionally
@@ -159,9 +160,9 @@ single-header `#define IMPLEMENTATION`-in-one-TU rules and inverted return codes
 (C), feature-gated APIs that vanish under `--no-default-features` (Rust), static
 `from()` factories instead of constructors (JVM), results returned on stdout with
 status via exit codes (Shell), an install command in the README that doesn't
-match the real filename/manifest (any). See §2's per-ecosystem table.
+match the real filename/manifest (any). See `languages/<lang>.md`.
 
-### Pillar 4 — Recipes for the common path
+### Principle 4 — Recipes for the common path
 
 For the few patterns that cover most real usage, give a **copy-pasteable** recipe
 and put it where the agent looks (README + the agent manual + the tag/API
@@ -170,12 +171,12 @@ the domain (a variable-length record). A recipe converts "the agent assembles
 the pattern from primitives and maybe gets it wrong" into "the agent copies a
 known-correct shape."
 
-### Pillar 5 — Design the API to shrink the error surface (the deep lever)
+### Principle 5 — Design the API to shrink the error surface (the deep lever)
 
 Docs reduce *mistakes about* the API; design reduces *the opportunity for*
 mistakes. This is where the biggest wins live, and it's the part teams skip.
 
-Three concrete moves, all from the case study:
+Three concrete moves:
 - **Eliminate manual bookkeeping.** We added a tag that auto-computes
   length/count fields at encode time, so the agent never hand-maintains a
   `len(x)` that must match a field — the single most error-prone part of the
@@ -190,7 +191,7 @@ Three concrete moves, all from the case study:
 Heuristic: every place your docs say "remember to…" is a candidate for a design
 change that removes the need to remember.
 
-### Pillar 6 — A contributor guide for agents (`AGENTS.txt`)
+### Principle 6 — A contributor guide for agents (`AGENTS.txt`)
 
 If you want agents to *extend* the code correctly, write down the invariants they
 must uphold. In our case the critical one was: a feature must be implemented
@@ -200,7 +201,7 @@ Without this, an agent confidently implements one path and silently breaks
 parity. (Note: `AGENTS.md`/`AGENTS.txt` is increasingly a recognized convention —
 align with whatever your tooling reads.)
 
-### Pillar 7 — Measure it with a clean-agent evaluation
+### Principle 7 — Measure it with a clean-agent evaluation
 
 You cannot judge agent-friendliness from the inside; you know too much. Run the
 loop:
@@ -218,7 +219,7 @@ the next improvement. Treat the friction log as your backlog.
 
 ### A note on languages and ecosystems
 
-The pillars are language-agnostic, but the **cost** of each varies by ecosystem,
+The principles are language-agnostic, but the **cost** of each varies by ecosystem,
 and it pays to know which ones your toolchain hands you for free. Two things vary
 the most: **where the manual must live so it reaches the consumer** (the
 distribution model, below) and **which in-language surface the pointer goes in**
@@ -251,26 +252,22 @@ identify which one the repo is in, then apply its fix:
   single-header C lib, one `.sh`) does **not** — so for those, put the pointer and
   the key traps **inside the file itself**.
 
-#### Per-ecosystem quick reference
+#### Per-ecosystem specifics
 
-| Ecosystem | Type/manifest signals | Doc surface (+ renderer) | Distribution model & manual fix |
-| :-- | :-- | :-- | :-- |
-| **Go** | `go.mod`; `cmd/` or `main` = CLI | `doc.go` / `go doc` (pkg.go.dev) | A — free from repo root |
-| **Rust** | `Cargo.toml`; `[[bin]]`/`src/main.rs` = CLI; `src/lib.rs` = lib | rustdoc `//!`/`///` (docs.rs) | A — free **unless `include` set**; feature-gated APIs change with `--no-default-features` |
-| **Swift** | `Package.swift`; `.library` vs `.executable` | DocC `///` (Swift Package Index) | A/C — git-URL, resolved checkout carries it; `@dynamicCallable` has no enumerable API surface |
-| **Python** | `pyproject.toml`*/`setup.py`; CLI = `console_scripts`/`__main__`+argparse | `__init__.py` docstring; CLI = `--help` | B — add `package_data`/`MANIFEST.in`; *or D if unpackaged*. *`pyproject` may be tool-config only — check for `[project]`/`[build-system]` |
-| **JS/TS** | `package.json`; `bin` = CLI; `exports`/`main` = lib | JSDoc/TSDoc; CLI = `--help` | B — add to `files`; *or D if Bun/Deno-compiled to a binary* |
-| **JVM** | `pom.xml` / `build.gradle(.kts)`; `.library` vs app-plugin | `package-info.java` + Javadoc (javadoc.io) | B — `src/main/resources` and/or the `-javadoc` jar; CLI app-dist is D; static `from()` factories are a common trap |
-| **C** | `Makefile`/`CMakeLists.txt`; headers + `.a`/`.so`; `main`+getopt = CLI | header top-comment; `usage()`; man pages | D — header/binary is the artifact; **single-header ⇒ put manual pointer + traps in the header**; man pages for installed CLIs |
-| **Shell** | no manifest — `.sh`/`.bash`, shebang, `bin/`, sourced-funcs vs `main` | SHDOC comments (+ generated README); `--help`; man | D — vendored repo carries it; a copied single `.sh` does not; results on stdout + status via exit codes (document `@exitcode`) |
+The signals, doc surface, distribution model, and the language-specific **traps**
+for each ecosystem live in `languages/<lang>.md` — read the one for the repo's
+language alongside this guide. Available: `go`, `python`, `javascript`, `c`,
+`rust`, `jvm`, `shell`, `swift`. If none matches, apply the agnostic guidance
+above and pick the closest distribution model (A–D); when in doubt, let the
+clean-agent evaluation surface the ecosystem's quirks.
 
 #### Other cross-cutting notes
 
-- **Wire a formatter + linter into CI** (pillar 2's drift defense) in any
+- **Wire a formatter + linter into CI** (principle 2's drift defense) in any
   ecosystem that doesn't hand you one (`gofmt`/`go vet` are Go-only freebies).
 - **The README isn't always at the repo root** (e.g. `.github/README.md`,
   `docs/`) — check there before concluding it's missing.
-- **The clean-agent evaluation (pillar 7) is the equalizer.** It surfaces
+- **The clean-agent evaluation (principle 7) is the equalizer.** It surfaces
   ecosystem-specific gaps — "the manual wasn't in the installed package," "there
   was no formatter so a generated change looked malformed" — regardless of
   language. When in doubt about a language's quirks, let the eval find them.
@@ -289,7 +286,7 @@ checklist automatically (see the README to install it).
 - [ ] `llms.txt` index present at repo root.
 - [ ] `llms-full.txt` (or equivalent) present and complete.
 - [ ] README links the agent manual near the top (check non-root locations too: `.github/`, `docs/`).
-- [ ] In-language doc comment points to the raw manual URL (use the ecosystem's doc surface — see §2's per-ecosystem table).
+- [ ] In-language doc comment points to the raw manual URL (use the ecosystem's doc surface — see `languages/<lang>.md`).
 - [ ] **The manual reaches the consumer per the repo's distribution model** (§2): for a registry **opt-in allowlist** (B) it's added (`package_data`/`MANIFEST.in`, npm `files`, JVM resources/`-javadoc` jar); for **ships-all** (A) it's at the repo root (and not excluded by Rust `include`); when the **artifact is the repo/binary/single file** (D) it's shipped in-repo + in the in-file doc comment + man/release assets, and registry-bundling is marked **N/A** — for a single copied file (single-header C, one `.sh`) the pointer and key traps live *inside the file*.
 
 **Correctness & trust**
@@ -344,14 +341,6 @@ items **N/A** with a reason rather than ❌.
   problem.
 - **Self-assessment only.** Without a clean-agent run you are grading your own
   homework.
-
----
-
-## 5. Case study: binarystruct (worked example)
-
-A condensed before/after lives in [`case-study/binarystruct.md`](case-study/binarystruct.md):
-what each pillar looked like in practice, the clean-agent evaluation that scored
-5/5, and the gap it surfaced that drove the next feature.
 
 ---
 
