@@ -232,7 +232,7 @@ and it pays to know which ones your toolchain hands you for free. Two things var
 the most: **where the manual must live so it reaches the consumer** (the
 distribution model, below) and **which in-language surface the pointer goes in**
 (the doc surface — named per ecosystem in `languages/<lang>.md`). Validated across Go, Python, JS/TS, C,
-Rust, JVM, Shell, and Swift.
+Rust, JVM, Shell, Swift, PHP, and Ruby.
 
 #### The distribution model decides where the manual lives ("does the manual travel?")
 
@@ -240,9 +240,11 @@ This is the single most ecosystem-divergent question. There are four models —
 identify which one the repo is in, then apply its fix:
 
 - **Model A — central registry, ships *all* files by default.** Go (module
-  cache), Rust (crates.io), Swift (SwiftPM resolves the full git checkout).
-  `llms-full.txt` travels **for free** from the repo root. *Caveat:* Rust silently
-  opts **out** if `Cargo.toml` sets `include = [...]` — check for it.
+  cache), Rust (crates.io), Swift (SwiftPM full checkout), PHP/Composer (the git
+  archive of the tag). `llms-full.txt` travels **for free** from the repo root.
+  *Caveats — opt-out filters:* Rust silently opts files **out** via `Cargo.toml`
+  `include = [...]`; PHP via `.gitattributes` `export-ignore` (an opt-*out* list —
+  the inverse of an allowlist). Check for either before assuming the manual ships.
 - **Model B — central registry, opt-in allowlist.** Python wheel, npm, JVM JAR.
   A root file is **not** shipped unless you add it: Python `package_data` /
   `MANIFEST.in`, npm `package.json` `files`, JVM `src/main/resources` (and note
@@ -273,7 +275,7 @@ lives" fix.
 The signals, doc surface, distribution model, and the language-specific **traps**
 for each ecosystem live in `languages/<lang>.md` — read the one for the repo's
 language alongside this guide. Available: `go`, `python`, `javascript`, `c`,
-`rust`, `jvm`, `shell`, `swift`. If none matches, apply the agnostic guidance
+`rust`, `jvm`, `shell`, `swift`, `php`, `ruby`. If none matches, apply the agnostic guidance
 above and pick the closest distribution model (A–D); when in doubt, let the
 clean-agent evaluation surface the ecosystem's quirks.
 
@@ -283,6 +285,29 @@ clean-agent evaluation surface the ecosystem's quirks.
   ecosystem that doesn't hand you one (`gofmt`/`go vet` are Go-only freebies).
 - **The README isn't always at the repo root** (e.g. `.github/README.md`,
   `docs/`) — check there before concluding it's missing.
+- **If the in-language doc surface doesn't exist yet, *create* it.** Sometimes the
+  pointer has no home — no `doc.go`, no `package-info.java`, zero rustdoc/DocC
+  comments. Don't skip the pointer: add the doc comment / module docstring so the
+  surface exists, then point it at the manual.
+- **Monorepos & sub-packages: the package root is not the repo root.** In a
+  monorepo/megarepo each publishable package lives in its own subdirectory, and
+  *that subdirectory is the unit* — everything above that says "repo root" means
+  the **package root**. This changes three things: (1) **placement** — the manual
+  lives in the package's subdir, where its consumers land, not at the monorepo
+  root (which is usually **never published**); (2) **distribution** — "does the
+  manual travel?" is decided by the *package's own* publish config (its
+  `package.json` `files`, its `pyproject.toml`/`MANIFEST.in`, its `.gitattributes`
+  `export-ignore`), not the root's; (3) **discoverability** — the pointer goes in
+  the *package's* doc surface and README, since a consumer reaches the package's
+  registry page, not the repo's top README. Detect a workspace via its manifest
+  (`pnpm-workspace.yaml`, npm/yarn `workspaces`, Cargo `[workspace]`, `go.work`,
+  `nx.json`/`turbo.json`/`lerna.json`, Maven `<modules>`, Gradle `settings`
+  includes). Read upward for shared context, but scope writes to the package
+  boundary. Watch the **build-from-root trap**: a member often can't build/test in
+  isolation (hoisted deps, shared tooling, path deps) — a clean-agent eval must
+  evaluate it *as a workspace member*, not treat "won't build alone" as a failure.
+  *(Auditing every member of a monorepo in one pass is not yet in scope — target
+  one package at a time.)*
 - **The clean-agent evaluation (principle 7) is the equalizer.** It surfaces
   ecosystem-specific gaps — "the manual wasn't in the installed package," "there
   was no formatter so a generated change looked malformed" — regardless of
@@ -299,11 +324,12 @@ checklist automatically (see the README to install it).
 > `SKILL.md` references it rather than keeping its own copy. Edit it here only.
 
 **Discoverability**
-- [ ] `llms.txt` index present at repo root.
+- [ ] `llms.txt` index present at the **package root** (the repo root, or the
+      member's subdir in a monorepo — see "Monorepos & sub-packages").
 - [ ] `llms-full.txt` (or equivalent) present and complete.
 - [ ] README links the agent manual near the top (check non-root locations too: `.github/`, `docs/`).
 - [ ] In-language doc comment points to the raw manual URL (use the ecosystem's doc surface — see `languages/<lang>.md`).
-- [ ] **The manual reaches the consumer per the repo's distribution model** (§2): for a registry **opt-in allowlist** (B) it's added (`package_data`/`MANIFEST.in`, npm `files`, JVM resources/`-javadoc` jar); for **ships-all** (A) it's at the repo root (and not excluded by Rust `include`); when the **artifact is the repo/binary/single file** (D) it's shipped in-repo + in the in-file doc comment + man/release assets, and registry-bundling is marked **N/A** — for a single copied file (single-header C, one `.sh`) the pointer and key traps live *inside the file*.
+- [ ] **The manual reaches the consumer per the repo's distribution model** (§2): for a registry **opt-in allowlist** (B) it's added (`package_data`/`MANIFEST.in`, npm `files`, JVM resources/`-javadoc` jar); for **ships-all** (A) it's at the package root (and not excluded by Rust `include` or `.gitattributes export-ignore`); when the **artifact is the repo/binary/single file** (D) it's shipped in-repo + in the in-file doc comment + man/release assets, and registry-bundling is marked **N/A** — for a single copied file (single-header C, one `.sh`) the pointer and key traps live *inside the file*.
 
 **Correctness & trust**
 - [ ] The source of truth is clear (a spec doc, or the code/godoc) and the docs match it.

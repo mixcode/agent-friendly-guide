@@ -18,8 +18,10 @@ agnostic `GUIDELINE.md`.
 
 ## Distribution model — does the manual travel?
 - **Model B (opt-in allowlist)** when published to PyPI as a wheel: a root
-  `llms-full.txt` is **not** shipped unless you add it — `MANIFEST.in`
-  (`include llms-full.txt`) and/or `package_data` / `[tool.setuptools.package-data]`.
+  `llms-full.txt` is **not** shipped unless you add it. Caveat: `package_data`
+  only ships files *inside the package directory*, not a repo-root file — use
+  `MANIFEST.in` (`include llms-full.txt`) for the sdist, or move the manual into
+  the package dir to reach the wheel.
 - **Model D** when consumed as an unpackaged script/clone (no wheel): the repo is
   the artifact — keep the manual in the repo + `--help`.
 
@@ -29,3 +31,5 @@ agnostic `GUIDELINE.md`.
   advertised install/deps against the manifest.
 - Optional/extra dependencies (`[project.optional-dependencies]`) change which
   imports are available — note feature-gated behavior.
+- **Multiple entry points:** a `__main__.py` (or several `console_scripts`) may
+  dispatch among more than one `main()` — document each command, not just one.

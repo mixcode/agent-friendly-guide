@@ -29,6 +29,17 @@ agent-friendliness from the inside — you know too much. This harness has a
 > if the agent rediscovers a trap you "already documented," your docs aren't
 > discoverable enough.
 
+### Workspace-member mode (monorepo sub-packages)
+
+When the thing under evaluation is **one package inside a monorepo**, fetch it the
+way a real consumer would — the **published package** from its registry (its own
+name@version), *not* a clone of the whole monorepo. That is the honest test:
+consumers get the package, not the workspace. If the package is only consumable as
+part of the repo (not separately published), say so — that itself is a finding. A
+member that **can't build or be used in isolation** (hoisted deps, shared tooling,
+path dependencies) is a real friction point about *that package's*
+standalone-usability — log it as a finding; don't treat it as the eval failing.
+
 ### Discovery-only mode (for read-only / sandboxed agents)
 
 The full loop needs an agent that can **write files, compile, and execute** — not

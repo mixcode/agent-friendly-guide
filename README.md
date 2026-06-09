@@ -11,7 +11,7 @@ LLM coding agents can use, extend, and not break, without a human in the loop.
 
 It is distilled from real-world conversions of production libraries and CLI
 tools, validated by having fresh agents build non-trivial things against the
-results, and tested across eight language ecosystems.
+results, and tested across ten language ecosystems.
 
 ## Contents
 
@@ -22,7 +22,7 @@ results, and tested across eight language ecosystems.
 - **[evaluation/](evaluation/clean-agent-eval.md)** — the clean-agent evaluation
   harness: a reusable prompt and how to run it.
 - **[languages/](languages/)** — per-ecosystem specifics (signals, doc surface,
-  distribution model, traps) for Go, Python, JavaScript, C, Rust, JVM, Shell, Swift.
+  distribution model, traps) for Go, Python, JavaScript, C, Rust, JVM, Shell, Swift, PHP, Ruby.
 - **[skills/agent-ready/](skills/agent-ready/SKILL.md)** — an Agent Skill (this
   repo is also a Claude Code plugin) that runs the audit, scaffolds the
   artifacts, and offers the clean-agent evaluation.

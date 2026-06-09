@@ -4,8 +4,8 @@ Language-specific specifics for the `agent-ready` method; read alongside the
 agnostic `GUIDELINE.md`. (Covers Node, Bun, and Deno.)
 
 ## Detect
-- `package.json`. CLI = a `bin` field (**verify it isn't `null`/empty**);
-  library = `exports`/`main`/`module`. A repo can be both.
+- `package.json`. CLI = a `bin` field (**verify it isn't `null`, empty, or
+  absent**); library = `exports`/`main`/`module`. A repo can be both.
 - The runtime may be **Bun or Deno**, not npm/Node — check the scripts/imports.
 
 ## Doc surface (where the manual pointer goes)
@@ -16,7 +16,9 @@ agnostic `GUIDELINE.md`. (Covers Node, Bun, and Deno.)
 - **Model B (opt-in allowlist):** npm ships only what `package.json` `"files"`
   lists (plus a few defaults) — add `llms-full.txt` to `"files"` so it travels.
 - **Model D:** if the CLI is compiled to a standalone binary (Bun/Deno `compile`),
-  the binary is the artifact — keep the manual in the repo + `--help`.
+  the binary is the artifact — keep the manual in the repo + `--help`. **No
+  registry config at all** (no `files`/`bin`/`exports`, not published to npm — e.g.
+  a Homebrew/release-asset binary) is itself a Model-D signal.
 
 ## Traps & idioms
 - **`exports` map / dual ESM-CJS:** the importable surface depends on the

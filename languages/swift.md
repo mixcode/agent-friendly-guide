@@ -8,7 +8,9 @@ agnostic `GUIDELINE.md`.
   (SwiftCLI / swift-argument-parser).
 
 ## Doc surface (where the manual pointer goes)
-- Library: DocC `///` comments, rendered on the Swift Package Index.
+- Library: DocC `///` comments, rendered on the Swift Package Index. (If the
+  package has *no* `///` comments yet, **create** the doc surface — add a
+  doc-comment to the entry type — then point it at the manual.)
 - CLI: ArgumentParser/SwiftCLI `--help`.
 
 ## Distribution model — does the manual travel?
@@ -24,6 +26,10 @@ Swift can land in two models; pick by **how this repo is actually consumed**:
 - **CLI shipped as a prebuilt binary** (release asset, Homebrew, etc.) **→ Model
   D.** The binary is the artifact — ship the manual in the repo + `--help` + man/
   release assets; don't expect a file to travel with the binary.
+
+**Tiebreaker:** having a `Package.swift` does *not* make it C — key on consumption.
+An `.executable` shipped as an installed binary → **D**; only C/A when consumers
+actually `import` the package as a dependency.
 
 ## Traps & idioms
 - **`@dynamicCallable` / dynamic member APIs have no enumerable surface** — the

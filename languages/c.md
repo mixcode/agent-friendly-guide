@@ -19,6 +19,9 @@ agnostic `GUIDELINE.md`. C is the sharpest test of "does the manual travel?"
   **copying one file** into another project — a separate `llms-full.txt` does
   **not** travel with it. So put the pointer **and the key traps inside the
   header itself**.
+- **Man pages are a real *travel* mechanism for installed CLIs**, not just a doc
+  surface: ship a `.1` and have `make install` place it in `share/man` so `man
+  <tool>` reaches the user. (Many C Makefiles install only the binary — check.)
 
 ## Traps & idioms
 - **Single-header implementation macro:** the header is inert until the consumer

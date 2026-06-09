@@ -23,10 +23,40 @@ proceeding with missing guidance.
 The invocation arguments are appended to this skill (look for an `ARGUMENTS:`
 line). Decide which repo to work on, in this order:
 
-1. If the arguments name a path, use that repo.
+1. If the arguments name a path, use that path.
 2. Otherwise use the current working directory — but **first confirm** it is the
-   repo the user means: state the absolute path you're about to audit and what it
+   target the user means: state the absolute path you're about to audit and what it
    appears to be, and proceed unless that looks wrong.
+
+**Then resolve the *scope* — the package boundary, which is not always the repo
+root.** In a monorepo/megarepo each publishable package lives in its own
+subdirectory, and *that subdirectory* — not the repo root — is the unit you audit
+and scaffold. Detect this before Phase 1:
+
+- **Is the target inside a workspace?** Look upward and around for a workspace
+  manifest: `pnpm-workspace.yaml`, npm/yarn `workspaces` in `package.json`, Cargo
+  `[workspace]` in `Cargo.toml`, `go.work`, `nx.json`, `turbo.json`, `lerna.json`,
+  Maven `<modules>` in `pom.xml`, Gradle `include`s in `settings.gradle(.kts)`.
+- **Resolve the target to one of three:**
+  - **standalone** — no workspace manifest; the repo root *is* the package root.
+    Proceed as normal (everything below collapses to "repo root").
+  - **workspace-member** — the target is (or is inside) one member package. **This
+    member's directory is the package root.** Scaffold *its* manual into *its*
+    subdir; evaluate "does the manual travel?" against *its* own publish config
+    (its `package.json` `files`, its `pyproject.toml`, its `.gitattributes`), not
+    the root's. The monorepo root is typically **never published**, so a manual
+    there reaches no consumer.
+  - **workspace-root with no member named** — the target is the monorepo root and
+    the user didn't pick a package. **Don't audit the root as if it were a
+    package.** List the member packages you found and ask which one to target
+    (whole-monorepo enumeration is out of scope for now).
+- **Read upward for context, write within the boundary.** You may read the
+  monorepo root (shared build config, tooling, top-level README) to *understand*
+  the package, but scope every file you create or edit to the package root.
+
+When this section and the phases below say "repo root," read it as **package
+root** — they're the same for a standalone repo and the member's subdir for a
+workspace member.
 
 ## Modes
 
@@ -94,7 +124,8 @@ Detect first:
   `bin` field may be `null`. **Shell has no manifest** — use `.sh`/`.bash` files,
   shebangs, a `bin/` dir, and sourced-functions-vs-`main` shape.
 - Language/ecosystem. **Read `${CLAUDE_PLUGIN_ROOT}/languages/<lang>.md`** if it
-  exists (`go`, `python`, `javascript`, `c`, `rust`, `jvm`, `shell`, `swift`) — it
+  exists (`go`, `python`, `javascript`, `c`, `rust`, `jvm`, `shell`, `swift`,
+  `php`, `ruby`) — it
   gives that ecosystem's detection signals, doc surface, distribution model, and
   traps. If there's no file for the language, fall back to the agnostic guidance
   and the **distribution model** taxonomy in GUIDELINE §2 (A ships-all / B opt-in
@@ -152,7 +183,9 @@ plus `llms-full-cli.txt` for a CLI/tool — see below). For each:
 2. Fill every section you can from verified repo facts; leave `{TODO: ...}`
    placeholders for anything you can't confirm (especially the traps and
    recipes — those need real API knowledge).
-3. Write the file at the repo root (confirm first if it already exists), then
+3. Write the file at the **package root** (the repo root for a standalone repo;
+   the member's subdir for a workspace member — see "Target repository"; confirm
+   first if it already exists), then
    **make it reach the consumer per the distribution model** (Phase 1 / GUIDELINE
    §2): for an **opt-in allowlist** (B) add it to `package_data`/`MANIFEST.in` /
    npm `files` / JVM resources; for a **single copied file** (D: single-header C,

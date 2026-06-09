@@ -16,6 +16,11 @@ agnostic `GUIDELINE.md`.
   repo-root `llms-full.txt` travels **for free** — **unless** `Cargo.toml` sets
   `include = [...]` (or `exclude`), which silently opts files out. **Check for it**
   and add the manual to `include` if present.
+- **A CLI crate is often dual-distributed:** on crates.io (`cargo install`, Model A)
+  *and* as a prebuilt binary via release assets / `cargo-binstall` / deb / Homebrew
+  (Model D). Cover both — the binary download won't carry a repo file.
+- Note: **docs.rs (rustdoc) is the *pointer's home*, not the manual** — render the
+  pointer there, but the full `llms-full.txt` still lives in the repo.
 
 ## Traps & idioms
 - **Feature-gated public API:** the available API changes with Cargo features

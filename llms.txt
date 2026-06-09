@@ -16,7 +16,7 @@ Claude Code plugin.
 - [README.md](README.md): overview, the short version, and how to install/use the skill.
 - [languages/](languages/): per-ecosystem specifics (signals, doc surface,
   distribution model, traps) — `go`, `python`, `javascript`, `c`, `rust`, `jvm`,
-  `shell`, `swift`.
+  `shell`, `swift`, `php`, `ruby`.
 
 ## The skill
 

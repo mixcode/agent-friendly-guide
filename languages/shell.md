@@ -25,3 +25,7 @@ agnostic `GUIDELINE.md`. Shell has **no manifest**, so detection is shape-based.
 - **Generated README:** if the README is generated (e.g. by `generate_readme.sh`
   from SHDOC), do **not** insert a callout into the generated region — edit the
   generator's source or a hand-maintained section.
+- **API shape — results on stdout, status via exit codes.** A sourced-function lib
+  doesn't "return" values or raise typed errors; read the checklist's "errors name
+  the location" item as **meaningful exit codes + stderr messages** (document the
+  SHDOC `@exitcode` for each function), not return-value/field naming.
