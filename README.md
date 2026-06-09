@@ -61,8 +61,9 @@ won't find them. Install as the plugin above instead.
 
 ## The short version
 
-1. Ship a machine-readable manual **in the repo** (`llms.txt` + `llms-full.txt`),
-   discoverable from the README and the in-language doc comment.
+1. Ship a machine-readable manual **in the repo** — `llms.txt` plus a full manual
+   (`llms-full.txt`, or an existing doc that already serves as one), discoverable
+   from the README and the in-language doc comment.
 2. Keep **one source of truth**; let docs and code never drift.
 3. **Name the traps** with the *why* and a rule — don't hide them.
 4. Give **copy-pasteable recipes** for the common paths.

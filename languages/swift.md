@@ -12,10 +12,18 @@ agnostic `GUIDELINE.md`.
 - CLI: ArgumentParser/SwiftCLI `--help`.
 
 ## Distribution model — does the manual travel?
-- **Model A / C:** SwiftPM has no central package registry by default — a consumer
-  references a **git URL + tag** (Model C), and SwiftPM resolves the **full git
-  checkout**, so a repo-root `llms-full.txt` travels with it (Model A behavior).
-  Document the git-URL + tag form as the "install" story (there's no one-word name).
+
+Swift can land in two models; pick by **how this repo is actually consumed**:
+
+- **SPM package (library or source CLI) → treat as C for *install*, A for
+  *manual-travel*.** SwiftPM has no central name registry, so the consumer
+  references a **git URL + tag** (Model C) — document that as the "install" story
+  (there's no one-word name). SwiftPM then resolves the **full git checkout**, so a
+  repo-root `llms-full.txt` travels with it for free (Model A behavior); no
+  allowlist needed.
+- **CLI shipped as a prebuilt binary** (release asset, Homebrew, etc.) **→ Model
+  D.** The binary is the artifact — ship the manual in the repo + `--help` + man/
+  release assets; don't expect a file to travel with the binary.
 
 ## Traps & idioms
 - **`@dynamicCallable` / dynamic member APIs have no enumerable surface** — the

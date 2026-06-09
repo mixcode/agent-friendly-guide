@@ -10,6 +10,14 @@ Make a target repository agent-friendly, following the method in
 `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md` (read it if you need the full rationale; the
 operational steps are below).
 
+**Preflight.** This skill reads its checklist, templates, language guides, and
+evaluation harness from `${CLAUDE_PLUGIN_ROOT}`. If that variable is empty, or
+`${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md` is unreadable (e.g. the skill was bare-copied
+without the plugin), **stop and tell the user to install the plugin** —
+`/plugin marketplace add mixcode/agent-friendly-guide` then
+`/plugin install agent-friendly-guide@agent-friendly-guide` — rather than
+proceeding with missing guidance.
+
 ## Target repository
 
 The invocation arguments are appended to this skill (look for an `ARGUMENTS:`
@@ -199,8 +207,11 @@ If the user agrees, use the harness and prompt template in
 `${CLAUDE_PLUGIN_ROOT}/evaluation/clean-agent-eval.md`: help fill in the
 `{braces}` for this repo (language, how to fetch the published version, a
 well-scoped tool to build that exercises the error-prone parts, an independent
-cross-check), run it as a sub-agent in an isolated directory, then triage its
-friction log into a backlog mapped to the checklist. **If the sub-agent can't
+cross-check). **Spawn it** with your sub-agent tool (e.g. the Task/Agent tool) as
+a fresh general-purpose agent, instructed to work in an isolated temp dir with no
+other context; if you have no way to spawn one, hand the filled-in prompt to the
+user to run in a clean session. Then triage its friction log into a backlog
+mapped to the checklist. **If the sub-agent can't
 build/compile/run** (read-only or sandboxed environment), use that harness's
 **discovery-only mode** — it reads the published artifact and reports
 first-contact friction without building, still yielding the discoverability and

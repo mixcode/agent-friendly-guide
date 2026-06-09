@@ -231,7 +231,7 @@ The principles are language-agnostic, but the **cost** of each varies by ecosyst
 and it pays to know which ones your toolchain hands you for free. Two things vary
 the most: **where the manual must live so it reaches the consumer** (the
 distribution model, below) and **which in-language surface the pointer goes in**
-(the doc surface, in the table below). Validated across Go, Python, JS/TS, C,
+(the doc surface — named per ecosystem in `languages/<lang>.md`). Validated across Go, Python, JS/TS, C,
 Rust, JVM, Shell, and Swift.
 
 #### The distribution model decides where the manual lives ("does the manual travel?")
@@ -259,6 +259,14 @@ identify which one the repo is in, then apply its fix:
   submodule, module cache) carries the manual along; **copying a single file** (a
   single-header C lib, one `.sh`) does **not** — so for those, put the pointer and
   the key traps **inside the file itself**.
+
+**Classifying an unlisted ecosystem (A–D).** (1) Is there a package registry the
+consumer installs from *by name*? If **no** → it's **C** (consumed by a git URL +
+tag) or **D** (no package — the repo, a built binary, or a single file is the
+artifact). (2) If **yes**, does publishing ship the whole repo by default, or only
+an allowlist? Check the packaging config: ships-all → **A**; opt-in allowlist (you
+must name the files to include) → **B**. Then apply that model's "where the manual
+lives" fix.
 
 #### Per-ecosystem specifics
 
