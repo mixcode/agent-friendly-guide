@@ -1,6 +1,5 @@
 # agent-friendly-guide
 
-[![Agent-Ready](https://img.shields.io/badge/Agent--Ready-passed-success)](GUIDELINE.md)
 [![llms.txt](https://img.shields.io/badge/llms.txt-compliant-blue)](llms.txt)
 
 > [!NOTE]
@@ -54,11 +53,11 @@ rest.
 ```
 Local development install: `claude --plugin-dir /path/to/agent-friendly-guide`.
 
-**As a standalone skill** (audit works everywhere; scaffolding needs the plugin
-assets):
-```
-cp -r skills/agent-ready ~/.claude/skills/
-```
+**Standalone (not recommended):** copying just the skill directory
+(`cp -r skills/agent-ready ~/.claude/skills/`) makes the `/agent-ready` command
+available, but the skill reads its checklist, templates, language guides, and
+evaluation harness from the plugin via `${CLAUDE_PLUGIN_ROOT}` — a bare copy
+won't find them. Install as the plugin above instead.
 
 ## The short version
 

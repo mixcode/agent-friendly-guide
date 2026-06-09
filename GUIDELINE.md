@@ -129,9 +129,9 @@ authority in the manual ("if the docs and code disagree, the code wins") rather
 than creating a new document.
 
 - When you change behavior, update ground truth in the same change.
-- Periodically diff docs against code. (In our conversion this caught a
-  `SPECIFICATION.md` claim that contradicted what the code generator actually
-  did — exactly the kind of thing an extending agent would have trusted.)
+- Periodically diff docs against code. (In practice this catches a spec claim
+  that contradicts what the code actually does — exactly the kind of thing an
+  extending agent would trust and get wrong.)
 - If you maintain translated docs, keep them at parity or mark them as possibly
   stale; a half-updated translation is a drift source.
 
@@ -166,9 +166,10 @@ match the real filename/manifest (any). See `languages/<lang>.md`.
 
 For the few patterns that cover most real usage, give a **copy-pasteable** recipe
 and put it where the agent looks (README + the agent manual + the tag/API
-reference). Our highest-value recipe was the single most common real layout in
-the domain (a variable-length record). A recipe converts "the agent assembles
-the pattern from primitives and maybe gets it wrong" into "the agent copies a
+reference). Pick the one or two patterns that cover most real usage — the typical
+request, the common record shape, the standard call sequence — and show each as a
+known-correct, copy-pasteable snippet. A recipe converts "the agent assembles the
+pattern from primitives and maybe gets it wrong" into "the agent copies a
 known-correct shape."
 
 ### Principle 5 — Design the API to shrink the error surface (the deep lever)
@@ -177,16 +178,18 @@ Docs reduce *mistakes about* the API; design reduces *the opportunity for*
 mistakes. This is where the biggest wins live, and it's the part teams skip.
 
 Three concrete moves:
-- **Eliminate manual bookkeeping.** We added a tag that auto-computes
-  length/count fields at encode time, so the agent never hand-maintains a
-  `len(x)` that must match a field — the single most error-prone part of the
-  format simply disappeared.
-- **Fail loud, with precise errors.** A mismatch now returns an error naming the
-  byte offset, the field, and got-vs-want. An agent (or human) debugging a bad
-  input is handed the answer instead of a generic failure.
-- **Make misuse hard or impossible.** Validate constraints at construction/parse
-  time with a clear message; keep behavior identical across all execution modes
-  so there are no per-mode surprises to memorize.
+- **Eliminate manual bookkeeping.** When two things must always agree — a length
+  field and the data it sizes, a count and its list, a checksum and its payload —
+  derive one from the other automatically instead of making the caller keep them
+  in sync. The most error-prone step (a hand-maintained value that has to match
+  another field) simply disappears.
+- **Fail loud, with precise errors.** Make a failure say *where* and *what* — the
+  location/field and expected-vs-actual — not a generic "invalid input." A precise
+  error hands the agent (or human) the answer; a vague one sends it guessing.
+- **Make misuse hard or impossible.** Validate constraints early (at
+  construction/parse time) with a clear message; and if the same operation has
+  more than one implementation or mode, keep them behaviorally identical so there
+  are no per-mode surprises to memorize.
 
 Heuristic: every place your docs say "remember to…" is a candidate for a design
 change that removes the need to remember.
@@ -194,12 +197,17 @@ change that removes the need to remember.
 ### Principle 6 — A contributor guide for agents (`AGENTS.txt`)
 
 If you want agents to *extend* the code correctly, write down the invariants they
-must uphold. In our case the critical one was: a feature must be implemented
-identically across three parallel code paths (reflection, unsafe, codegen), with
-a step-by-step extension checklist and a "write tests in all modes" rule.
-Without this, an agent confidently implements one path and silently breaks
-parity. (Note: `AGENTS.md`/`AGENTS.txt` is increasingly a recognized convention —
-align with whatever your tooling reads.)
+must uphold. A common critical one: when the same behavior lives in more than one
+place (e.g. a reference implementation plus an optimized or generated one), a
+change must land in all of them identically — pair this with a step-by-step
+extension checklist and a "test every path/mode" rule. Without it, an agent
+confidently updates one place and silently breaks parity.
+
+On the name: `AGENTS.md` is the recognized convention (agent harnesses auto-read
+it), but it's often a file the *maintainer* writes and owns. To avoid clobbering
+that, the scaffolded contributor guide is `AGENTS.txt` — a plain-text sibling,
+with a self-describing header saying what it is. If the repo already has an
+`AGENTS.md` (or `CLAUDE.md`), **align with / point to it rather than duplicating**.
 
 ### Principle 7 — Measure it with a clean-agent evaluation
 
@@ -213,9 +221,9 @@ loop:
    to read source, or hit a confusing error.
 4. Fix the friction. Re-run.
 
-This is what closed the loop for us: the clean-agent build scored highly *and*
-surfaced a concrete gap (a missing feature for fixed/magic values) that became
-the next improvement. Treat the friction log as your backlog.
+This is the loop in action: a clean-agent build can score highly *and* surface a
+concrete capability or doc gap that becomes the next improvement. Treat the
+friction log as your backlog.
 
 ### A note on languages and ecosystems
 

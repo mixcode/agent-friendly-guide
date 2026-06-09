@@ -1,13 +1,18 @@
-# Agent Instructions for Contributing to {Project Name}
+# AGENTS.txt — instructions for AI agents *contributing to* {Project Name}
+
+> **What this is:** a plain-text sibling of the `AGENTS.md` convention — the
+> "how to work on this repo correctly" guide for agents (and humans). It is named
+> `.txt`, not `.md`, on purpose: so it never collides with or overwrites an
+> `AGENTS.md` you maintain yourself. If you keep an `AGENTS.md`, treat this as its
+> agent-friendliness-specific companion (or merge the two). For *using* the
+> project, see `llms-full.txt` instead.
 
 Read this before modifying the codebase. It lists the invariants you must
-preserve and the checklist for adding a feature correctly. (For *using* the
-library, see llms-full.txt instead.)
+preserve and the checklist for adding a feature correctly.
 
 <!--
-AGENTS.md / AGENTS.txt is an increasingly recognized convention for agent-facing
-contributor instructions — align the filename with whatever your tooling reads.
-Keep this focused on invariants and process, not API usage.
+Keep this focused on invariants and process, not API usage. If the repo already
+has an AGENTS.md / CLAUDE.md, align with / point to it rather than duplicating.
 -->
 
 ## 1. Project shape

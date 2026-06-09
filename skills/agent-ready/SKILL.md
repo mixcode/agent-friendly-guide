@@ -200,7 +200,11 @@ If the user agrees, use the harness and prompt template in
 `{braces}` for this repo (language, how to fetch the published version, a
 well-scoped tool to build that exercises the error-prone parts, an independent
 cross-check), run it as a sub-agent in an isolated directory, then triage its
-friction log into a backlog mapped to the checklist.
+friction log into a backlog mapped to the checklist. **If the sub-agent can't
+build/compile/run** (read-only or sandboxed environment), use that harness's
+**discovery-only mode** — it reads the published artifact and reports
+first-contact friction without building, still yielding the discoverability and
+selection signal.
 
 If the user declines, point them to `evaluation/clean-agent-eval.md` so they can
 run it later, and finish with the Phase-1 gap report as the backlog.

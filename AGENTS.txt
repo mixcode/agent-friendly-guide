@@ -1,4 +1,8 @@
-# Agent Instructions for Contributing to agent-friendly-guide
+# AGENTS.txt — instructions for AI agents *contributing to* agent-friendly-guide
+
+> **What this is:** a plain-text sibling of the `AGENTS.md` convention — the "how
+> to work on this repo correctly" guide for agents. Named `.txt`, not `.md`, on
+> purpose, so it never collides with an `AGENTS.md` a maintainer keeps separately.
 
 Read this before modifying this repo. It documents the invariants that keep the
 method, the skill, and the templates from drifting apart. (To *use* the method,
@@ -12,8 +16,8 @@ This repo is both a **methodology** and a **Claude Code plugin**:
 - `GUIDELINE.md` — the method (7 principles, the audit checklist, anti-patterns).
   **This is the source of truth.**
 - `README.md` — overview, the short version, and skill install/usage.
-- `templates/` — fill-in skeletons (`llms.txt`, `llms-full.txt`, `AGENTS.txt`)
-  the skill scaffolds from.
+- `templates/` — fill-in skeletons (`llms.txt`, `llms-full.txt`,
+  `llms-full-cli.txt` for CLI/tool repos, `AGENTS.txt`) the skill scaffolds from.
 - `evaluation/clean-agent-eval.md` — the reusable clean-agent evaluation harness.
 - `languages/<lang>.md` — per-ecosystem specifics (signals, doc surface,
   distribution model, traps) the skill loads after detecting the language.
