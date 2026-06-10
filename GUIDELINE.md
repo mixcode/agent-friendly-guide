@@ -294,7 +294,9 @@ clean-agent evaluation surface the ecosystem's quirks.
   *that subdirectory is the unit* — everything above that says "repo root" means
   the **package root**. This changes three things: (1) **placement** — the manual
   lives in the package's subdir, where its consumers land, not at the monorepo
-  root (which is usually **never published**); (2) **distribution** — "does the
+  root (which is *often* not separately published — **though don't assume it**: in
+  some ecosystems, notably **Go**, the root `go.mod` is itself the primary
+  published module and needs its own manual too); (2) **distribution** — "does the
   manual travel?" is decided by the *package's own* publish config (its
   `package.json` `files`, its `pyproject.toml`/`MANIFEST.in`, its `.gitattributes`
   `export-ignore`), not the root's; (3) **discoverability** — the pointer goes in
@@ -302,8 +304,10 @@ clean-agent evaluation surface the ecosystem's quirks.
   registry page, not the repo's top README. Detect a workspace via its manifest
   (`pnpm-workspace.yaml`, npm/yarn `workspaces`, Cargo `[workspace]`, `go.work`,
   `nx.json`/`turbo.json`/`lerna.json`, Maven `<modules>`, Gradle `settings`
-  includes). Read upward for shared context, but scope writes to the package
-  boundary. Watch the **build-from-root trap**: a member often can't build/test in
+  includes) — **or, with no workspace file at all, by finding multiple package
+  manifests in the tree** (several `go.mod`/`Cargo.toml`/`package.json`); nested Go
+  modules in particular need no `go.work`. Read upward for shared context, but
+  scope writes to the package boundary. Watch the **build-from-root trap**: a member often can't build/test in
   isolation (hoisted deps, shared tooling, path deps) — a clean-agent eval must
   evaluate it *as a workspace member*, not treat "won't build alone" as a failure.
   Give the monorepo root its own discoverability surface: a **root `llms.txt`

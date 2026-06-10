@@ -37,6 +37,13 @@ and scaffold. Detect this before Phase 1:
   manifest: `pnpm-workspace.yaml`, npm/yarn `workspaces` in `package.json`, Cargo
   `[workspace]` in `Cargo.toml`, `go.work`, `nx.json`, `turbo.json`, `lerna.json`,
   Maven `<modules>` in `pom.xml`, Gradle `include`s in `settings.gradle(.kts)`.
+  **A workspace manifest is sufficient but not necessary** — a repo can hold
+  multiple independently-publishable packages with no top-level workspace file at
+  all. The decisive signal is **more than one package manifest in the tree**: most
+  tellingly **multiple `go.mod` files** (nested Go modules need no `go.work`), but
+  also several `Cargo.toml`/`package.json`/`pyproject.toml` each defining a real
+  package. If you see that, treat it as a workspace even when no workspace manifest
+  ties them together.
 - **Resolve the target to one of three:**
   - **standalone** — no workspace manifest; the repo root *is* the package root.
     Proceed as normal (everything below collapses to "repo root").
@@ -44,8 +51,11 @@ and scaffold. Detect this before Phase 1:
     member's directory is the package root.** Scaffold *its* manual into *its*
     subdir; evaluate "does the manual travel?" against *its* own publish config
     (its `package.json` `files`, its `pyproject.toml`, its `.gitattributes`), not
-    the root's. The monorepo root is typically **never published**, so a manual
-    there reaches no consumer.
+    the root's. The monorepo root is *often* not separately published, so a manual
+    there may reach no consumer — but **don't assume it**: in some ecosystems the
+    root manifest is itself a published package (notably **Go**, where the root
+    `go.mod` is the primary module). When the root is published too, it needs its
+    own manual, not only a map of the others.
   - **workspace-root with no member named** — the target is the monorepo root and
     the user didn't pick a package. **Don't audit the root as if it were a
     package.** If `--monorepo` is set, run the **monorepo survey** (below). Otherwise
@@ -103,16 +113,24 @@ workspace root. It maps the whole monorepo and triages each package; it does
 **not** scaffold them (deep work stays one-package-at-a-time). The guardrails
 above still apply.
 
-1. **Enumerate the members** from the workspace manifest (don't guess from the
-   directory tree alone):
+1. **Enumerate the members.** Prefer the workspace manifest when there is one
+   (don't guess from the directory tree alone); when there isn't, fall back to
+   **finding every package manifest in the tree** — a repo can be multi-package
+   with no workspace file.
    - **pnpm** — `packages:` globs in `pnpm-workspace.yaml`.
    - **npm / yarn** — the `workspaces` array/globs in the root `package.json`.
    - **Cargo** — `members` (and `exclude`) under `[workspace]` in `Cargo.toml`.
-   - **Go** — `use` directives in `go.work`.
+   - **Go** — `use` directives in `go.work` **if present; otherwise every `go.mod`
+     in the tree** (`find . -name go.mod`, excluding `vendor/`). Nested modules
+     need no `go.work`, so go.work-only enumeration misses them. Treat each
+     distinct `go.mod` as a member — **including the root `go.mod` itself**, which
+     in Go (unlike most ecosystems) is normally a published module in its own right.
    - **lerna / nx / turbo** — `packages` in `lerna.json`; for nx/turbo the members
      are usually the `workspaces` packages — resolve those.
    - **Maven** — `<modules>` in the parent `pom.xml` (recurse for nested modules).
    - **Gradle** — `include`/`includeBuild` in `settings.gradle(.kts)`.
+   - **No manifest convention matches** — fall back to "every directory with its
+     own package manifest is a member."
    Expand the globs to concrete directories and keep only those that are actually
    publishable packages (have their own manifest).
 2. **Triage each member** — a *lightweight* scan, not the full audit (that's the
@@ -130,6 +148,11 @@ above still apply.
    the build-from-root trap). If a root `llms.txt` already exists, show a diff and
    confirm before overwriting. Verify the build/filter commands you write are real
    (read the workspace manifest / scripts) — don't invent them.
+   **If the root is itself a published package** (e.g. a Go repo whose root
+   `go.mod` is the primary module), don't reduce its `llms.txt` to a bare map: that
+   root also needs a real manual. List it as a member in the table like any other,
+   recommend a single-package run on it (step 5), and let the sub-module map live
+   *alongside* the root's own index rather than replacing it.
 4. **Cap and be honest about coverage.** For a large megarepo, if there are more
    than ~30 members, confirm scope first or triage a named subset — and **never
    silently truncate**: list any package you did not survey.

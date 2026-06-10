@@ -29,8 +29,11 @@
 <!--
 This is the monorepo's ROOT entry point. Write it to the repository root as
 `llms.txt` (the name agents look for at a repo root) — NOT as `llms-monorepo.txt`.
-The monorepo root is not itself a published package, so its `llms.txt` is this
-package map rather than a single project's index.
+The monorepo root is *often* not itself a published package, so its `llms.txt` is
+this package map rather than a single project's index. Exception: ecosystems where
+the root manifest IS a real published package — e.g. a Go repo whose root `go.mod`
+is the primary module. There the root needs its own manual too; let this map live
+*alongside* the root's own index rather than replacing it.
 
 It follows the llms.txt convention (https://llms.txt.org): H1 title, blockquote
 summary, H2 sections. Keep it a map, not a manual — the substance for each package

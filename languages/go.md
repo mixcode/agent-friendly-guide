@@ -7,6 +7,13 @@ agnostic `GUIDELINE.md`. Go is the most-validated ecosystem and the easiest case
 - `go.mod` present. CLI = a `cmd/` dir or a `package main` with a `main` func
   (flag/cobra/spf13). Library = exported (capitalized) API, no `main`.
 - A repo can be both (a library that also ships a `cmd/` CLI) — note both.
+- **Multi-module repos:** more than one `go.mod` in the tree means more than one
+  independently-published module — and **Go needs no `go.work` for that** (a
+  nested `go.mod` is excluded from its parent and resolved on its own). For the
+  monorepo survey, enumerate every `go.mod` (`find . -name go.mod`, minus
+  `vendor/`), not just `go.work` `use` entries — and the **root `go.mod` itself is
+  a published module**, so it's both a member to survey *and* a package needing its
+  own manual (not only a map).
 
 ## Doc surface (where the manual pointer goes)
 - Library: the package doc comment / `doc.go`, rendered by `go doc` and pkg.go.dev.
