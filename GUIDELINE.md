@@ -66,6 +66,37 @@ type-specific* (a library's agent reads in-language docs and examples first; a
 tool's agent reads the README / `--help`), so the manual's content must sit where
 *that* type's agent actually looks.
 
+### Decide by contract legibility, not repo type alone
+
+Before deciding *what* to invest in, ask one question: **is the contract the agent
+needs legible from what it will actually read at the point of use?** That — not the
+repo's type label — is what determines where agent-readiness pays off.
+
+- **Contract *not* legible → invest in the manual / cheat-sheet.** When the consumed
+  artifact hides the contract, a dedicated manual is the surface that helps. This
+  covers: a **compiled binary / CLI** (the agent invokes it and reads `--help`, not
+  `main.go`; operational semantics — exit codes, side effects, unattended flags —
+  live in no signature), a **service / HTTP API** or **MCP server** (no source
+  reaches the consumer), and **source-shipped but indirection-heavy** code where
+  signatures don't tell the story (facades, `__call`/reflection, code generation, a
+  tag/DSL grammar).
+- **Contract legible → invest in the source and its native docs, and kill drift.**
+  For an ordinary source-shipped **library**, the agent reads the signatures and
+  godoc/docstrings directly and reconstructs the contract cheaply — so a separate
+  manual is a near-empty delta (neutral when ignored, a tax when forced). The
+  leverage is **making the read surface true and complete enough**: accurate
+  godoc/docstrings, zero drift (principle 2), a clear selection surface, and inlined
+  traps where the API has a sharp edge — not a parallel manual.
+
+The **selection surface** (principle 1) and the **contributor guide** (`AGENTS.txt`,
+principle 6) are worth it *either way* — reading the API tells an agent *how* to
+call the thing, not *whether* it should, nor how to safely *modify* it.
+
+In our testing this held across repos and languages: agent-readiness artifacts cut
+an agent's token cost substantially for CLIs/tools (contract not legible) but were
+neutral-to-counterproductive for well-documented libraries (contract already
+legible) — agents are source-first and won't open a manual they don't need.
+
 ---
 
 ## 2. The method — seven principles
@@ -151,6 +182,13 @@ in ("make a repo agent-friendly", "add llms.txt").
 Designate one **ground truth** for behavior and make every other doc agree with
 it. Drift is worse than missing docs: an agent that trusts a confident-but-wrong
 statement fails in ways that are hard to debug.
+
+The asymmetry is the whole point. A **missing** manual costs an agent *tokens* — it
+reads the source and recovers. A **wrong** comment or doc costs *correctness* — the
+agent trusts it and fails, often silently, never checking the code. So for a
+source-shipped library (where, per "decide by contract legibility," the read
+surface *is* the lever), **eliminating drift between code, comments, and docs is
+the highest-value agent-readiness work — above writing any separate manual.**
 
 Ground truth is usually **the code and its in-language docs (godoc/docstrings)** —
 for a simple library that *is* the authority, and the agent manual derives from

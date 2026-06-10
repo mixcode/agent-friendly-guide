@@ -83,6 +83,12 @@ The arguments may include a mode switch. Pick the stopping point:
   the depth switches — it does **not** scaffold each member (run a single-package
   pass per member for that). Only meaningful at a workspace root; on a standalone
   repo it falls back to a normal `--full` run.
+- **`--drift-audit`** → **drift audit & fix only**: run Phase 1's drift check
+  (below) over the native doc surface, then **correct every contradiction against
+  the code** (Phase 2's "fix drift first"), and stop. Do **not** scaffold a manual.
+  This is the highest-value pass for a well-documented, source-shipped library —
+  where the read surface, not a manual, is the lever (see GUIDELINE "decide by
+  contract legibility").
 
 State the target repo and the mode in one line before you start.
 
@@ -239,6 +245,19 @@ docs already serve the agent** — the highest-leverage gap is usually content t
 conventional docs *don't* carry, not a missing `llms-full.txt`. Flag a manual that
 is bloated or merely duplicates an already-good godoc as `present-but-weak`, not a ✅.
 
+**Drift audit — the read surface vs the code (highest-value for legible-contract repos).**
+For every behavioral claim in the surface the agent actually reads — the
+in-language docs (godoc/`doc.go`, docstrings, header comments), the README's usage
+prose, and type hints — **verify it against what the code actually does**: units,
+defaults, argument order, keyword names, valid value sets, return type/semantics,
+and error conditions. **Trace into helpers/delegates where the real behavior lives**
+— do not assume a public docstring matches the implementation it calls. Any claim
+that contradicts the code is a **drift finding** and ranks at the **top** of the
+fix list: per principle 2 this is the asymmetric risk — a *wrong* doc makes an
+agent fail silently (it trusts the doc and never re-checks the code), whereas a
+*missing* doc only costs it some reading. Report each as
+`claim → actual code behavior → file:line`.
+
 End Phase 1 with the **top 3–5 highest-leverage fixes**. If `--audit-only`, stop here.
 
 ---
@@ -277,6 +296,14 @@ plus `llms-full-cli.txt` for a CLI/tool — see below). For each:
    and show what changed; never silently rewrite them, and **never edit inside a
    generated region** (e.g. a SHDOC-generated README, a `<!-- generated -->`
    block) — put the callout in a hand-maintained section or the generator's source.
+
+**Fix drift first.** Before (and often instead of) scaffolding any manual, correct
+every **drift finding** from Phase 1: make a minimal edit to the offending
+docstring/comment/README line so it states **what the code actually does** — the
+code is the source of truth. For a source-shipped **library** this is the
+single highest-value action, because the agent reads that surface and a separate
+manual won't be read (and could not rescue a wrong surface anyway). Show each
+correction as a diff against the original. If `--drift-audit`, stop after this.
 
 **Match the manual to the repo type** (from Phase 1). For a **CLI or MCP server**,
 the manual is tool-facing, not an API cheat sheet — start from the
