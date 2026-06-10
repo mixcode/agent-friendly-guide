@@ -27,7 +27,7 @@ Claude Code plugin.
 
 ## Templates & evaluation
 
-- [templates/](templates/): fill-in skeletons (`llms.txt`, `llms-full.txt`, `llms-full-cli.txt` for CLI/tool repos, `AGENTS.txt`).
+- [templates/](templates/): fill-in skeletons (`llms.txt`, `llms-full.txt`, `llms-full-cli.txt` for CLI/tool repos, `llms-monorepo.txt` for a monorepo root's package map, `AGENTS.txt`).
 - [evaluation/clean-agent-eval.md](evaluation/clean-agent-eval.md): the clean-agent evaluation harness.
 
 ## For contributors

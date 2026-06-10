@@ -1,7 +1,7 @@
 ---
 name: agent-ready
 description: Make a repository agent-friendly. Audits the current repo against the agent-readiness checklist, scaffolds an agent manual (llms.txt / llms-full.txt) and a contributor guide (AGENTS.txt), and offers a clean-agent evaluation. Use when asked to make a repo or library agent-friendly or LLM-friendly, to add llms.txt / llms-full.txt / AGENTS.txt, to write an agent manual, or to assess how easily an AI agent can use a codebase. Not for general code review or bug-hunting, writing application/runtime code, or authoring docs unrelated to agent-readiness.
-argument-hint: "[--full | --audit-only | --scaffold]"
+argument-hint: "[--full | --audit-only | --scaffold | --monorepo]"
 ---
 
 # agent-ready
@@ -48,8 +48,9 @@ and scaffold. Detect this before Phase 1:
     there reaches no consumer.
   - **workspace-root with no member named** — the target is the monorepo root and
     the user didn't pick a package. **Don't audit the root as if it were a
-    package.** List the member packages you found and ask which one to target
-    (whole-monorepo enumeration is out of scope for now).
+    package.** If `--monorepo` is set, run the **monorepo survey** (below). Otherwise
+    list the member packages you found and ask whether to survey them all
+    (`--monorepo`) or target one.
 - **Read upward for context, write within the boundary.** You may read the
   monorepo root (shared build config, tooling, top-level README) to *understand*
   the package, but scope every file you create or edit to the package root.
@@ -66,6 +67,12 @@ The arguments may include a mode switch. Pick the stopping point:
 - **`--scaffold`** → run Phases 1–2, then stop (do not offer the evaluation).
 - **`--full`** → full run: Phases 1–3. **This is the default** — also used when no
   switch is given.
+- **`--monorepo`** → **monorepo survey** (breadth, not depth): when the target is a
+  workspace root, enumerate every member package, triage each, and write a
+  root-level **monorepo map**. See "Monorepo survey mode" below. `--monorepo` overrides
+  the depth switches — it does **not** scaffold each member (run a single-package
+  pass per member for that). Only meaningful at a workspace root; on a standalone
+  repo it falls back to a normal `--full` run.
 
 State the target repo and the mode in one line before you start.
 
@@ -86,6 +93,49 @@ State the target repo and the mode in one line before you start.
   repos, mirror the existing doc language.
 - **Run, don't just claim.** Use real commands to inspect the repo; quote what
   you actually found.
+
+---
+
+## Monorepo survey mode (`--monorepo`)
+
+Run this **instead of** Phases 1–3 when `--monorepo` is set and the target is a
+workspace root. It maps the whole monorepo and triages each package; it does
+**not** scaffold them (deep work stays one-package-at-a-time). The guardrails
+above still apply.
+
+1. **Enumerate the members** from the workspace manifest (don't guess from the
+   directory tree alone):
+   - **pnpm** — `packages:` globs in `pnpm-workspace.yaml`.
+   - **npm / yarn** — the `workspaces` array/globs in the root `package.json`.
+   - **Cargo** — `members` (and `exclude`) under `[workspace]` in `Cargo.toml`.
+   - **Go** — `use` directives in `go.work`.
+   - **lerna / nx / turbo** — `packages` in `lerna.json`; for nx/turbo the members
+     are usually the `workspaces` packages — resolve those.
+   - **Maven** — `<modules>` in the parent `pom.xml` (recurse for nested modules).
+   - **Gradle** — `include`/`includeBuild` in `settings.gradle(.kts)`.
+   Expand the globs to concrete directories and keep only those that are actually
+   publishable packages (have their own manifest).
+2. **Triage each member** — a *lightweight* scan, not the full audit (that's the
+   single-package pass). For each, record: its **type** (Phase 1 signals), whether
+   it has its **own `llms.txt`** and a **full manual**, whether its **README points
+   to the manual**, and whether the **manual would travel** per *that member's own*
+   publish config (its `files`/`package_data`/`.gitattributes`/`spec.files`). Roll
+   that into a coarse status — **✅ ready / ⚠️ partial / ❌ not started** — plus the
+   one-line top gap.
+3. **Write the monorepo map** to the **monorepo root as `llms.txt`** (the name an
+   agent looks for at a repo root), from
+   `${CLAUDE_PLUGIN_ROOT}/templates/llms-monorepo.txt`. Fill the package table
+   (name, path, type, manual link, status) and the "Working in this monorepo"
+   notes (workspace manager, how to build one package, shared-config locations,
+   the build-from-root trap). If a root `llms.txt` already exists, show a diff and
+   confirm before overwriting. Verify the build/filter commands you write are real
+   (read the workspace manifest / scripts) — don't invent them.
+4. **Cap and be honest about coverage.** For a large megarepo, if there are more
+   than ~30 members, confirm scope first or triage a named subset — and **never
+   silently truncate**: list any package you did not survey.
+5. **Recommend the next moves.** End with the highest-leverage packages to make
+   agent-ready first (e.g. the most-depended-on or most-published), each as a
+   ready-to-run single-package command — `/agent-ready {path/to/member}`.
 
 ---
 

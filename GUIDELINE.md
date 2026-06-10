@@ -306,8 +306,12 @@ clean-agent evaluation surface the ecosystem's quirks.
   boundary. Watch the **build-from-root trap**: a member often can't build/test in
   isolation (hoisted deps, shared tooling, path deps) — a clean-agent eval must
   evaluate it *as a workspace member*, not treat "won't build alone" as a failure.
-  *(Auditing every member of a monorepo in one pass is not yet in scope — target
-  one package at a time.)*
+  Give the monorepo root its own discoverability surface: a **root `llms.txt`
+  that is a package map** — which packages exist, where each one's manual lives,
+  and how agent-ready each is — so a contributor agent landing on the repo can
+  navigate to the right package. (The `agent-ready` skill's `--monorepo` mode surveys a
+  workspace and writes this map; deep per-package work still runs one package at a
+  time.)
 - **The clean-agent evaluation (principle 7) is the equalizer.** It surfaces
   ecosystem-specific gaps — "the manual wasn't in the installed package," "there
   was no formatter so a generated change looked malformed" — regardless of

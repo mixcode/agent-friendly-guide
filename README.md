@@ -18,7 +18,8 @@ results, and tested across ten language ecosystems.
 - **[GUIDELINE.md](GUIDELINE.md)** — the method: seven principles, an audit
   checklist, anti-patterns, and language/ecosystem notes. Start here.
 - **[templates/](templates/)** — fill-in skeletons for `llms.txt`,
-  `llms-full.txt`, `llms-full-cli.txt` (the CLI/tool-facing manual), and `AGENTS.txt`.
+  `llms-full.txt`, `llms-full-cli.txt` (the CLI/tool-facing manual),
+  `llms-monorepo.txt` (a monorepo root's package map), and `AGENTS.txt`.
 - **[evaluation/](evaluation/clean-agent-eval.md)** — the clean-agent evaluation
   harness: a reusable prompt and how to run it.
 - **[languages/](languages/)** — per-ecosystem specifics (signals, doc surface,
@@ -37,6 +38,11 @@ inside any repository to make it agent-friendly:
   `--full` is the default when no switch is given.
 - **`/agent-ready --scaffold`** — audit + scaffold, stop before the evaluation.
 - **`/agent-ready --audit-only`** — just the prioritized gap report.
+- **`/agent-ready --monorepo`** — **monorepo survey**: point it at a workspace root and
+  it enumerates every member package, triages each, and writes a root *monorepo
+  map* (`llms.txt`) showing where each package's manual lives and how agent-ready
+  it is. Deep per-package work still runs one package at a time
+  (`/agent-ready packages/foo`).
 
 (When installed as a plugin the command is namespaced: `/agent-friendly-guide:agent-ready`.)
 

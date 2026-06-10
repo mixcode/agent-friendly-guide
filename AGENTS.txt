@@ -17,7 +17,8 @@ This repo is both a **methodology** and a **Claude Code plugin**:
   **This is the source of truth.**
 - `README.md` — overview, the short version, and skill install/usage.
 - `templates/` — fill-in skeletons (`llms.txt`, `llms-full.txt`,
-  `llms-full-cli.txt` for CLI/tool repos, `AGENTS.txt`) the skill scaffolds from.
+  `llms-full-cli.txt` for CLI/tool repos, `llms-monorepo.txt` for a monorepo
+  root's package map, `AGENTS.txt`) the skill scaffolds from.
 - `evaluation/clean-agent-eval.md` — the reusable clean-agent evaluation harness.
 - `languages/<lang>.md` — per-ecosystem specifics (signals, doc surface,
   distribution model, traps) the skill loads after detecting the language.

@@ -1,0 +1,39 @@
+# {Monorepo Name}
+
+> A monorepo of {N} packages{ — shared domain/context in one line}. **Consumers
+> install the individual packages, not this repo** — each package's own
+> `llms.txt` / `llms-full.txt` is its manual. This file is the **map**: which
+> packages exist, where each one's manual lives, and how agent-ready each is.
+
+## Packages
+
+| Package | Path | Type | Manual | Agent-ready |
+| :-- | :-- | :-- | :-- | :-- |
+| `{@scope/name}` | [{packages/foo}]({packages/foo}/) | library | [llms.txt]({packages/foo}/llms.txt) | ✅ ready |
+| `{name-b}` | [{packages/bar}]({packages/bar}/) | CLI | {TODO: none yet} | ❌ not started |
+| `{name-c}` | [{tools/baz}]({tools/baz}/) | MCP server | [llms.txt]({tools/baz}/llms.txt) | ⚠️ partial — {top gap} |
+
+<!-- Status: ✅ ready / ⚠️ partial (note the top gap) / ❌ not started. -->
+
+## Working in this monorepo
+
+- **Workspace manager:** {pnpm / npm / yarn / Cargo / go.work / Maven / Gradle / lerna / nx / turbo}.
+- **Build one package:** {the command, run from where — `pnpm --filter {pkg} build`, `cargo build -p {pkg}`, etc.}
+- **Shared config / tooling lives at:** {paths — root tsconfig, shared lint/format, codegen}.
+- **Build-from-root trap:** {which packages can't build/test in isolation and why — hoisted deps, path deps, shared codegen — or "none: each package builds standalone".}
+
+## For contributors
+
+- [AGENTS.txt](AGENTS.txt): repo-wide invariants and the per-package extension checklist.
+
+<!--
+This is the monorepo's ROOT entry point. Write it to the repository root as
+`llms.txt` (the name agents look for at a repo root) — NOT as `llms-monorepo.txt`.
+The monorepo root is not itself a published package, so its `llms.txt` is this
+package map rather than a single project's index.
+
+It follows the llms.txt convention (https://llms.txt.org): H1 title, blockquote
+summary, H2 sections. Keep it a map, not a manual — the substance for each package
+lives in that package's own llms-full.txt. Update a row's status when a package is
+made agent-ready; this map is the one place to see coverage across the repo.
+-->
