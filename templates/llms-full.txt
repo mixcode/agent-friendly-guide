@@ -9,13 +9,25 @@ and known traps needed to use {Project Name} correctly on the first try.
 
 <!--
 HOW TO USE THIS TEMPLATE
-- Fill each section; delete sections that genuinely don't apply (don't leave
-  empty headers).
-- Keep it dense and concrete. Prefer a correct copy-pasteable snippet over prose.
-- Every claim here must match the code and the ground-truth spec (no drift).
-- Ship this file IN the repo, and make sure it travels with the published
-  package (module vendoring / npm "files" / Python package data / crate include).
-- Validate it with the clean-agent evaluation (see the guide's evaluation/).
+- This manual is the *delta over your existing docs*, not a second copy of them.
+  If the godoc / docstrings / README already cover something well, LINK to it and
+  move on — don't restate it. A manual that merely duplicates good in-language
+  docs goes unread (a library's agent reaches for godoc first) and wastes tokens
+  if anyone forces a read.
+- FRONT-LOAD the highest-value content: the traps and the one canonical recipe
+  come first, because that is the delta an agent cannot get from signatures alone.
+- For a LIBRARY, the agent's default path is the in-language doc surface
+  (godoc / docstrings) + a runnable example — it often won't open this file on its
+  own. So ALSO inline the decisive traps + canonical recipe THERE; treat this file
+  as the exhaustive "read-the-manual" reference (the fallback), not the only home.
+- Keep it lean and concrete: a correct copy-pasteable snippet beats prose. Delete
+  sections that don't apply (don't leave empty headers). Aim for the smallest file
+  that lets an agent succeed first-try — if it grows past a couple of screens you
+  are probably restating docs that already exist; link out instead.
+- Every claim must match the code and ground-truth spec (no drift). Ship it IN the
+  repo and make sure it travels with the published package (module vendoring / npm
+  "files" / Python package data / crate include). Validate it with the clean-agent
+  evaluation (see the guide's evaluation/).
 -->
 
 ---
@@ -23,7 +35,9 @@ HOW TO USE THIS TEMPLATE
 ## 1. Syntax / API cheat sheet
 
 {The minimum an agent needs to call the thing: the core entry points with exact
-signatures, the primary types, and the one canonical "hello world" call.}
+signatures, the primary types, and the one canonical "hello world" call. If the
+godoc already lists these clearly, keep this short and link to it instead of
+restating it.}
 
 ```{lang}
 {smallest complete working example — imports through a successful call}
@@ -31,32 +45,28 @@ signatures, the primary types, and the one canonical "hello world" call.}
 
 ---
 
-## 2. Crucial rules & constraints
+## 2. Traps (the highest-value section — put it first)
 
-{Hard requirements that are not obvious from signatures. One subsection each.}
+{The places an agent will otherwise guess wrong. This content does not exist in
+signatures or a typical README, so it is the main reason this file earns its keep.
+For each trap: the symptom, the rule, and the *why*. For a library, mirror these
+few inline in the doc surface too — that's where the agent actually lands.}
 
-### A. {Setup that must happen first}
-{e.g. encodings/handlers that must be registered before use, with the code.}
-
-### B. {Constraint}
-{...}
-
-### Traps (the places an agent will otherwise guess wrong)
-{This is the highest-value content. For each trap: the symptom, the rule, and
-the *why*. Examples of trap categories:}
 - **Argument order / signature shape.** {If functions differ, give the unifying
   rule and tell the agent to verify signatures rather than copy from a sibling.}
 - **Concurrency.** {What is safe to call concurrently; what must not be shared.}
-- **Surprising-but-deliberate behavior.** {State it and the reasoning so the
-  agent builds the right mental model and doesn't "fix" it.}
+- **Surprising-but-deliberate behavior.** {State it and the reasoning so the agent
+  builds the right mental model and doesn't "fix" it.}
 - **Build tags / feature flags / modes.** {Anything that changes behavior.}
+- **Setup that must happen first.** {Encodings/handlers/registration that must
+  happen before use, with the code.}
 
 ---
 
 ## 3. Recipes (the common real-world patterns)
 
-{For each frequent pattern, a copy-pasteable, known-correct snippet. These
-prevent the agent from assembling primitives incorrectly.}
+{For each frequent pattern, a copy-pasteable, known-correct snippet. The single
+most common pattern is also worth inlining in the doc surface for a library.}
 
 ### {Pattern name — e.g. "the most common record/request shape"}
 ```{lang}
@@ -66,7 +76,14 @@ prevent the agent from assembling primitives incorrectly.}
 
 ---
 
-## 4. Debugging & error diagnosis
+## 4. Crucial rules & constraints
+
+{Hard requirements not obvious from signatures that didn't fit as a trap. One
+subsection each; keep to what the agent genuinely can't infer from the docs.}
+
+---
+
+## 5. Debugging & error diagnosis
 
 {How an agent should diagnose failures. Name the inspection/trace tools and the
 structured error types: which fields they expose (offset, location, field,
@@ -78,16 +95,16 @@ expected-vs-actual) and how to match on them.}
 
 ---
 
-## 5. Validation, performance modes, codegen, etc.
+## 6. Advanced (validation, performance modes, codegen, …) — link out when you can
 
-{Any remaining capabilities an agent should know: declarative validation,
-performance/build modes, code generation, JSON/schema export. Keep each to the
-essentials + a snippet.}
+{Remaining capabilities an agent occasionally needs. Keep each to one line + a
+snippet, or just LINK to the reference/spec — this is the section most likely to
+bloat into a doc duplicate. Don't restate a complete reference here.}
 
 ---
 
-## 6. Contributor note
+## 7. Contributor note
 
-{If agents may modify this codebase, point to AGENTS.txt and state the single
-most important invariant inline (e.g. "changes must be mirrored across N code
-paths — see AGENTS.txt").}
+{If agents may modify this codebase, point to AGENTS.txt and state the single most
+important invariant inline (e.g. "changes must be mirrored across N code paths —
+see AGENTS.txt").}

@@ -8,7 +8,7 @@ thing to know before using it.}
 
 ## Docs
 
-- [Full agent manual](llms-full.txt): cheat sheet, rules, traps, recipes, debugging — read this first for code generation.
+- [Full agent manual](llms-full.txt): traps, recipes, rules, cheat sheet, debugging — the agent-specific delta over the docs below.
 - [README](README.md): human-oriented overview and quick start.
 - [API / reference]({link}): full reference for {types, endpoints, tags, ...}.
 - [Specification / ground truth]({link}): authoritative behavior spec.

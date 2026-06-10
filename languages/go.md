@@ -15,9 +15,15 @@ agnostic `GUIDELINE.md`. Go is the most-validated ecosystem and the easiest case
   a published module**, so it's both a member to survey *and* a package needing its
   own manual (not only a map).
 
-## Doc surface (where the manual pointer goes)
-- Library: the package doc comment / `doc.go`, rendered by `go doc` and pkg.go.dev.
-  Put the one-line pointer to the raw `llms-full.txt` at the top of `doc.go`.
+## Doc surface (where the manual content lives — not just a pointer)
+- Library: the package doc comment / `doc.go` (rendered by `go doc` and
+  pkg.go.dev) **plus `Example` functions in `*_test.go`** (also rendered on
+  pkg.go.dev). This is the agent's **default discovery path** — it reads godoc and
+  examples before opening any separate manual, and often won't follow a `doc.go →
+  llms-full.txt` link once godoc answers it. So **inline the decisive traps and the
+  one canonical recipe here** — in `doc.go` and a runnable `Example` — not only as
+  a pointer. Put the one-line raw-`llms-full.txt` pointer at the top of `doc.go`
+  too, but treat it as a fallback, not the primary surface.
 - CLI: `--help` / `flag.Usage`. Give it a one-line purpose + synopsis banner.
 
 ## Distribution model — does the manual travel?

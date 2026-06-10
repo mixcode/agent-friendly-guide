@@ -12,8 +12,13 @@ agnostic `GUIDELINE.md`.
   `argparse` block under `examples/` or a demo `__main__` is not the CLI.
 - Library = an importable package (`src/<pkg>/` or `<pkg>/__init__.py`).
 
-## Doc surface (where the manual pointer goes)
-- Library: the top-level package `__init__.py` module docstring.
+## Doc surface (where the manual content lives — not just a pointer)
+- Library: the top-level package `__init__.py` module docstring **plus public
+  function/class docstrings and a runnable example** (shown via `help()`/`pydoc`
+  and in IDEs). This is the agent's **default discovery path** for a library — it
+  reads docstrings and examples before opening a separate manual — so **inline the
+  decisive traps and the canonical recipe here**, not only as a pointer to
+  `llms-full.txt`.
 - CLI: argparse/click `--help` / the parser `description`.
 
 ## Distribution model — does the manual travel?

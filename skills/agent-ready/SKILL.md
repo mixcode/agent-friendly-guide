@@ -230,6 +230,15 @@ gaps. For any type, mark inapplicable core items **N/A** with a one-line reason
 (e.g. a docs/methodology repo has no "errors name the location" item) rather than
 forcing a ❌.
 
+**For a library, score the agent's *default path*, not just file presence.** A
+library's agent reads the in-language docs (godoc/docstrings) and examples first
+and often won't open a separate root manual on its own. So score Discoverability
+on whether the **decisive traps + canonical recipe are reachable inline on that
+path** (godoc/`doc.go`, a runnable example), and assess whether the **existing
+docs already serve the agent** — the highest-leverage gap is usually content the
+conventional docs *don't* carry, not a missing `llms-full.txt`. Flag a manual that
+is bloated or merely duplicates an already-good godoc as `present-but-weak`, not a ✅.
+
 End Phase 1 with the **top 3–5 highest-leverage fixes**. If `--audit-only`, stop here.
 
 ---
@@ -275,7 +284,14 @@ the manual is tool-facing, not an API cheat sheet — start from the
 not for"), then the **invocation contract** (commands/flags or tool name + input
 schema, auth/env), then **output and error legibility** and which operations
 mutate state. For a **library**, use `llms-full.txt` — the API cheat sheet +
-recipes lead.
+recipes lead — but because a library's agent reads the **in-language docs and
+examples first and often won't open a separate manual**, also **inline the
+decisive traps and the one canonical recipe into the doc surface** (godoc/`doc.go`,
+a docstring) **and add or annotate a runnable example** (a Go `Example` test) that
+shows the trap-prone path. Keep `llms-full.txt` a **lean delta** over the existing
+docs — front-load the traps/recipe and link out to good existing docs; don't
+restate an already-complete godoc (a bloated, redundant manual just goes unread,
+and wastes the agent's tokens if it's ever forced to read it).
 
 Then wire **discoverability** (the cheapest, highest-return fixes):
 - Add a short callout near the top of the README pointing to `llms-full.txt`
@@ -283,6 +299,13 @@ Then wire **discoverability** (the cheapest, highest-return fixes):
   `.github/`, edit it there).
 - Add a one-line pointer in the ecosystem's in-language doc surface to the raw
   manual URL (see `languages/<lang>.md` for which surface).
+- For a **library**, the *inline* traps/recipe in the doc surface + example
+  (above) are the **primary** discoverability surface; the raw-URL pointer is a
+  fallback an agent may not follow once the godoc answers it. Spend the effort
+  inline, not just on the pointer.
+- **Never** wire a rule/hook (CLAUDE.md, a pre-task instruction) that forces "read
+  `llms-full.txt` first" — make it findable and let the agent pull; forcing a read
+  is at best neutral and counterproductive for well-documented libraries.
 
 If the audit found a clear "common pattern," draft a copy-pasteable **recipe**
 for it (or a `{TODO}` recipe stub if you can't verify the API).

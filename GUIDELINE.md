@@ -60,7 +60,11 @@ Cutting across every type, an agent must do three things — make each easy:
   underweighted dimension, and it is exactly what tool use hinges on.
 - **Use** — invoke it correctly the first time (traps, recipes, error legibility).
 
-The seven principles serve all three; **find** and **select** both live in principle 1.
+The seven principles serve all three; **find** and **select** both live in
+principle 1 — including the fact that an agent's *default discovery path is
+type-specific* (a library's agent reads in-language docs and examples first; a
+tool's agent reads the README / `--help`), so the manual's content must sit where
+*that* type's agent actually looks.
 
 ---
 
@@ -95,8 +99,38 @@ Then make it **discoverable** from the places an agent already lands:
   module docstring, etc.) to the raw URL of `llms-full.txt`.
 - Optionally a badge.
 
-Keep the human-facing docs human-facing: put the dense agent material in
-`llms-full.txt` and *link* to it, rather than bloating the README/godoc.
+**Discoverability is repo-type-specific — meet the agent on its default path.**
+An agent's first move depends on what it's consuming, and a manual it never opens
+saves it nothing. Observed behaviour: on a **library**, clean agents go to the
+in-language docs (godoc/pkg.go.dev, docstrings) and the source/examples first —
+they do **not** open a root `llms.txt` on their own, and frequently won't even
+follow a godoc → `llms-full.txt` *link* once the godoc itself answers them. On a
+**CLI / tool / service / MCP server**, agents do reach for the README / `--help` /
+root docs, so a manual there is on the path. The consequence:
+
+- **Library:** put the decisive **traps and the one canonical recipe *inline* in
+  the in-language doc surface and a runnable example** (a Go `Example` test, a
+  docstring sample) — the surface the agent actually reads — not merely linked
+  from it. `llms-full.txt` remains the exhaustive reference for the case where a
+  human *tells* the agent to read it.
+- **CLI / tool / service / MCP:** the root manual (plus `--help` / the
+  `description`) is the agent's path; lead it there.
+
+**Write the manual as the *delta* over existing docs, and keep it lean.** Before
+authoring, assess what the conventional docs (godoc, README, a spec) already give
+an agent and spend effort on the **gap** — don't restate docs that are already
+good. A manual that duplicates an already-excellent godoc is dead weight: the
+agent won't open it unprompted, and if forced to, the extra tokens buy nothing.
+(Measured: a ~8k-token manual that merely duplicated a library's already-strong
+godoc *raised* an agent's token cost ~20% when it was forced to read it and was
+ignored entirely when it wasn't; a focused ~1k-token CLI manual *cut* cost ~35%.)
+Front-load the decisive traps and recipe so an agent that does open it hits the
+high-value content first; link out to the good existing docs for the rest.
+
+**Discoverability-first — invite, never force.** Make the manual findable and let
+the agent pull what it needs. Do **not** wire a rule/hook that commands "read
+`llms-full.txt` first" on every task: forcing a read is at best neutral and, for a
+repo with good in-language docs, measurably counterproductive.
 
 **Selection surface (so the agent picks you for the right job).** Discoverability
 gets the agent *to* you; the selection surface gets it to use you *correctly*.
@@ -234,6 +268,13 @@ distribution model, below) and **which in-language surface the pointer goes in**
 (the doc surface — named per ecosystem in `languages/<lang>.md`). Validated across Go, Python, JS/TS, C,
 Rust, JVM, Shell, Swift, PHP, and Ruby.
 
+For a **library** in any of these ecosystems, that in-language doc surface (plus
+runnable examples) is the agent's **default discovery path** — it reads there
+before opening any separate manual — so the decisive traps and the canonical
+recipe belong *inline* there, not only linked from it (Principle 1). The
+per-language files name the surface; treat it as where the content lives, not just
+where a pointer goes.
+
 #### The distribution model decides where the manual lives ("does the manual travel?")
 
 This is the single most ecosystem-divergent question. There are four models —
@@ -337,6 +378,8 @@ checklist automatically (see the README to install it).
 - [ ] `llms-full.txt` (or equivalent) present and complete.
 - [ ] README links the agent manual near the top (check non-root locations too: `.github/`, `docs/`).
 - [ ] In-language doc comment points to the raw manual URL (use the ecosystem's doc surface — see `languages/<lang>.md`).
+- [ ] **The decisive content is on the agent's *default path* for this repo type.** For a **library**, the key traps + the canonical recipe are reachable *inline in the in-language doc surface (godoc/docstring) and a runnable example* — not only inside (or linked from) a separate `llms-full.txt` that a library's agent won't open on its own.
+- [ ] **The manual is a lean *delta* over existing docs**, not a restatement of already-good docs: it front-loads the traps/recipe and links out for the rest (a manual that duplicates an excellent godoc goes unread, and costs tokens for nothing if forced).
 - [ ] **The manual reaches the consumer per the repo's distribution model** (§2): for a registry **opt-in allowlist** (B) it's added (`package_data`/`MANIFEST.in`, npm `files`, JVM resources/`-javadoc` jar); for **ships-all** (A) it's at the package root (and not excluded by Rust `include` or `.gitattributes export-ignore`); when the **artifact is the repo/binary/single file** (D) it's shipped in-repo + in the in-file doc comment + man/release assets, and registry-bundling is marked **N/A** — for a single copied file (single-header C, one `.sh`) the pointer and key traps live *inside the file*.
 
 **Correctness & trust**
@@ -362,6 +405,11 @@ checklist automatically (see the README to install it).
 
 Apply on top of the core checklist for the repo's type; mark inapplicable core
 items **N/A** with a reason rather than ❌.
+
+**Library / API** (consumed by *writing code against it*)
+- [ ] The agent's default path is the **in-language docs + examples**, not a root manual: the decisive traps and the canonical recipe are **inline in the doc surface (godoc/docstring/JSDoc) and a runnable example**, reachable without opening `llms-full.txt`.
+- [ ] `llms-full.txt` is the *exhaustive* reference (for the "read the manual" case) and a **lean delta** over the in-language docs — not a duplicate of an already-good godoc.
+- [ ] **Select:** the README / doc-surface opening line states what it's for and *not* for, so an agent imports it for the right job.
 
 **CLI tool** (consumed by *invoking commands*)
 - [ ] `--help` / usage is complete: subcommands, flags, defaults.
@@ -391,6 +439,13 @@ items **N/A** with a reason rather than ❌.
   problem.
 - **Self-assessment only.** Without a clean-agent run you are grading your own
   homework.
+- **A manual that duplicates already-good in-language docs.** For a library,
+  agents read godoc/docstrings and examples first and won't open a redundant root
+  manual — inline the decisive delta where they land, and keep `llms-full.txt` a
+  lean reference.
+- **Forcing "read the manual first."** A rule/hook that mandates reading the
+  manual on every task taxes the agent when it isn't needed (measurably so for
+  well-documented libraries). Make the manual discoverable; let the agent pull.
 
 ---
 

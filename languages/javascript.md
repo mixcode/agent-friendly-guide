@@ -8,8 +8,12 @@ agnostic `GUIDELINE.md`. (Covers Node, Bun, and Deno.)
   absent**); library = `exports`/`main`/`module`. A repo can be both.
 - The runtime may be **Bun or Deno**, not npm/Node — check the scripts/imports.
 
-## Doc surface (where the manual pointer goes)
-- Library: JSDoc/TSDoc on the entry module.
+## Doc surface (where the manual content lives — not just a pointer)
+- Library: JSDoc/TSDoc on the entry module **plus exported-symbol doc comments and
+  a runnable example** (shown on IntelliSense/hover and TypeDoc). This is the
+  agent's **default discovery path** for a library — it reads the typed signatures
+  and JSDoc before opening a separate manual — so **inline the decisive traps and
+  the canonical recipe here**, not only as a pointer to `llms-full.txt`.
 - CLI: `--help`.
 
 ## Distribution model — does the manual travel?

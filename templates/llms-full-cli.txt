@@ -12,6 +12,9 @@ It is a **CLI tool** (consumed by *invoking commands*), not an importable librar
 HOW TO USE THIS TEMPLATE (CLI / tool-facing manual)
 - This is the tool-facing counterpart to llms-full.txt. Lead with SELECTION
   (use when / not for) and the INVOCATION CONTRACT, not an API cheat sheet.
+- Keep it a lean *delta* over `--help`/README: `--help` stays authoritative for
+  the full flag list — capture here only what an agent can't get from it (the
+  selection surface, the traps, the headless recipe). Don't transcribe every flag.
 - Fill each section from verified facts; delete genuinely-inapplicable ones.
 - Ship it so it reaches the consumer per the repo's distribution model
   (GUIDELINE §2): packaged-allowlist → add it; binary/repo-is-the-artifact →
