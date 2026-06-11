@@ -25,13 +25,13 @@ Two audiences you are writing for, and they need different things:
 
 And two levels of effort, with very different payoff curves:
 
-- **Doc-level** (principles 1–2, 4–7): cheap, applies to any repo, large immediate
+- **Doc-level** (Principles 1–2, 4–7): cheap, applies to any repo, large immediate
   return. Start here.
-- **Design-level** (principle 3): changing the API/code itself so it is hard to
+- **Design-level** (Principle 3): changing the API/code itself so it is hard to
   misuse. Higher effort, highest ceiling. This is where "agent-friendly" stops
   being about documentation.
 
-The feedback loop (principle 8) is what tells you when you're done.
+The feedback loop (Principle 8) is what tells you when you're done.
 
 ### Repo types — what "consume" means
 
@@ -60,13 +60,12 @@ Cutting across every type, an agent must do three things — make each easy:
   underweighted dimension, and it is exactly what tool use hinges on.
 - **Use** — invoke it correctly the first time (traps, recipes, error legibility).
 
-The eight principles serve all three; **find** is now principle 2 (put content on
-the agent's *verified* read path) and **select** is principle 6 (the selection
-surface) — the key fact being that an agent reads a *task-specific, repo-specific*
-set of surfaces (a library's agent gravitates to examples, a task-named reference
-doc, and the source; a tool's agent to the README / `--help`) and you must put the
-content where *that* agent is **observed** to look — not where you assume it looks
-(it is often *not* `doc.go`).
+The eight principles serve all three: **find** is Principle 2 (put content on the
+agent's *verified* read path) and **select** is Principle 6 (the selection surface).
+The key fact: an agent reads a *task-specific, repo-specific* set of surfaces — a
+library's agent gravitates to the examples, a task-named reference doc, and the source;
+a tool's agent to the README / `--help`. Put the content where *that* agent is
+**observed** to look, not where you assume it looks (often *not* `doc.go`).
 
 ### Decide by contract legibility, not repo type alone
 
@@ -87,7 +86,7 @@ repo's type label — is what determines where agent-readiness pays off.
   godoc/docstrings directly and reconstructs the contract cheaply — so a separate
   manual is a near-empty delta (neutral when ignored, a tax when forced). The
   leverage is **making the read surface true and complete enough**: accurate
-  godoc/docstrings, zero drift (principle 1), a clear selection surface, and inlined
+  godoc/docstrings, zero drift (Principle 1), a clear selection surface, and inlined
   traps where the API has a sharp edge — not a parallel manual.
 
 **"Legible" includes more than the code body — subtract the *API names* and the
@@ -103,8 +102,8 @@ counter-prior, agents failed it 0/4 without the manual and 4/4 with it; when it 
 through well-named knobs, the manual added little.) Spend the manual's words on the
 residue — not on restating signatures the agent reads or facts it already has.
 
-The **selection surface** (principle 6) and the **contributor guide** (`AGENTS.txt`,
-principle 7) are worth it *either way* — reading the API tells an agent *how* to
+The **selection surface** (Principle 6) and the **contributor guide** (`AGENTS.txt`,
+Principle 7) are worth it *either way* — reading the API tells an agent *how* to
 call the thing, not *whether* it should, nor how to safely *modify* it.
 
 In our testing this held across repos and languages: agent-readiness artifacts cut
@@ -116,8 +115,8 @@ legible) — agents are source-first and won't open a manual they don't need.
 
 ## 2. The method — eight principles
 
-**Ordered by leverage** (what actually moves an agent's success, per the evaluation
-record): keeping the read surface *true* and the API *unmissable* comes first;
+**Ordered by leverage** (what actually moved an agent's success in clean-agent
+evaluations): keeping the read surface *true* and the API *unmissable* comes first;
 shipping/finding a separate manual comes last, because agents read the code's own
 surfaces and can't be reliably steered to a bolt-on doc. The `find → select → use`
 lens is a cross-cutting view, not this ordering.
@@ -134,6 +133,29 @@ agent trusts it and fails, often silently, never checking the code. So for a
 source-shipped library (where, per "decide by contract legibility," the read
 surface *is* the lever), **eliminating drift between code, comments, and docs is
 the highest-value agent-readiness work — above writing any separate manual.**
+
+But not all drift bites equally — and knowing which kind to hunt first is what makes
+this tractable. The danger of a wrong statement scales with how **unverifiable** it is:
+
+- **Verifiable drift mostly self-corrects.** When the wrong doc contradicts something
+  the agent can re-derive from adjacent code — a signature, a macro/`#ifdef`, a flag, a
+  compiler error, an independently checkable output — the agent trusts the code and
+  routes around the doc. (Measured: an injected signature/macro/option drift left the
+  task passing 4/4 across Go, JS, C, and PHP; agents verified against the code and
+  ignored the wrong comment.)
+- **Unverifiable-convention drift is catastrophic.** When the wrong fact is a
+  *convention* — a unit, default, ordering, or semantic the agent **can't** check
+  against adjacent code, with no output it can independently confirm (e.g. a doc that
+  says "amount is a 0–100 percent" when the code means a 0–1 fraction) — the agent has
+  nothing to catch it on and fails completely. (Measured: this class failed **0/4**
+  across four languages; only a drift audit that rewrites the convention to match the
+  code rescues it.)
+
+So when you "diff docs against code," **prioritize the unverifiable**: conventions,
+units, defaults, ordering, and semantics that aren't re-derivable from a nearby
+signature or a checkable result. Verifiable facts can drift a little and the agent
+recovers; an unverifiable convention that drifts is a silent, total failure — and it is
+exactly the residue a manual is for (Principle 6), which is why it must be *true*.
 
 This is the deepest form of the whole method: agent-friendliness is **a property of
 the code composition itself** — accurate signatures, true docstrings/comments,
@@ -290,7 +312,7 @@ read or already knows.
 wire a rule/hook that commands "read `llms-full.txt` first" — at best neutral, and
 counterproductive for well-documented repos.
 
-### Principle 7 — A contributor guide for agents (`AGENTS.txt`)
+### Principle 7 — A contributor guide for agents (`AGENTS.txt` — `.txt` on purpose, see below)
 
 If you want agents to *extend* the code correctly, write down the invariants they
 must uphold. A common critical one: when the same behavior lives in more than one
@@ -323,7 +345,44 @@ friction log as your backlog.
 
 The eval is also an **instrument, not just a grade**: watch *which files the agent
 opens* — that is how you discover its read path (Principle 2) — and note any claim it
-trusted that the code contradicts (drift, Principle 1). The friction log is your backlog.
+trusted that the code contradicts (drift, Principle 1).
+
+#### Measure it directly: pass-rate first, tokens second
+
+The friction report is qualitative. When you want a number — to defend a change or
+compare two artifact designs — run a controlled A/B instead of asking an agent how it
+felt. Two axes, in priority order:
+
+1. **Correctness (the primary signal).** Define a task with a *checkable* answer and
+   run a fresh agent N times per condition (N≈4 is enough to see a regime; more for a
+   close call). Compare **pass-rate**, not vibes.
+2. **Cost (the secondary signal).** Count the **novel tokens** the reasoning model
+   processes — *intake* (input + cache-creation) **plus** output — and **exclude**
+   cache *reads* (re-reading the same context is nearly free) and any smaller
+   background/helper model. Read it from the run's structured usage, not a guess: an
+   agent CLI that emits machine-readable usage (e.g. a JSON run-summary with a
+   per-model token block) gives you the figure per condition. Compare medians; with
+   small N a rank test (Mann–Whitney U) tells you whether a gap is real or noise.
+
+Conditions worth separating: **A** = artifacts absent (stripped repo), **B1** =
+artifacts present *and* the agent is told to read the manual first, **B2** = artifacts
+present but the agent discovers them on its own (the realistic case — and a direct
+read-path check for Principle 2: if B2 ≈ A, the agent never found the manual).
+
+**The caveat that makes or breaks this measurement:** on small, well-documented
+targets the token axis *saturates* — at **equal success** the delta collapses to
+≈neutral, because a capable agent solves the task from the source either way and the
+manual changes only how it narrates. Read naively, that says "artifacts don't matter."
+It doesn't — it says *this task couldn't see the difference.* The token matrix only
+discriminates when token cost co-varies with a real knowledge gap. So the decisive
+experiment is the **failure regime**: construct the exact condition your artifact
+targets — an *unverifiable* doc/code drift (a convention the agent can't re-derive from
+adjacent code, Principle 1) or a *missing* piece of domain residue (Principle 6) — and
+measure **pass-rate**. That is where a true, well-placed artifact moves the number from
+near-zero to near-perfect, and where tokens-at-equal-success is blind. Tokens reward
+trimming verbosity; correctness rewards the artifact *existing and being read at all*.
+Lead with correctness; treat tokens as a tie-breaker between designs that both pass.
+
 ### A note on languages and ecosystems
 
 The principles are language-agnostic, but the **cost** of each varies by ecosystem,
@@ -389,7 +448,7 @@ clean-agent evaluation surface the ecosystem's quirks.
 
 #### Other cross-cutting notes
 
-- **Wire a formatter + linter into CI** (principle 1's drift defense) in any
+- **Wire a formatter + linter into CI** (Principle 1's drift defense) in any
   ecosystem that doesn't hand you one (`gofmt`/`go vet` are Go-only freebies).
 - **The README isn't always at the repo root** (e.g. `.github/README.md`,
   `docs/`) — check there before concluding it's missing.
@@ -424,7 +483,7 @@ clean-agent evaluation surface the ecosystem's quirks.
   navigate to the right package. (The `agent-ready` skill's `--monorepo` mode surveys a
   workspace and writes this map; deep per-package work still runs one package at a
   time.)
-- **The clean-agent evaluation (principle 8) is the equalizer.** It surfaces
+- **The clean-agent evaluation (Principle 8) is the equalizer.** It surfaces
   ecosystem-specific gaps — "the manual wasn't in the installed package," "there
   was no formatter so a generated change looked malformed" — regardless of
   language. When in doubt about a language's quirks, let the eval find them.
@@ -467,6 +526,10 @@ checklist automatically (see the README to install it).
 **Evidence**
 - [ ] A clean-agent evaluation has been run on the *published* artifact, and its
       friction log triaged.
+- [ ] For a contested change, a controlled A/B was run — **pass-rate** as the primary
+      signal (and, where it discriminates, **novel-token** cost read from structured
+      run usage), with the decisive comparison in the **failure regime** the artifact
+      targets, not just an equal-success token count.
 
 ### Type overlays
 

@@ -386,6 +386,22 @@ selection signal.
 If the user declines, point them to `evaluation/clean-agent-eval.md` so they can
 run it later, and finish with the Phase-1 gap report as the backlog.
 
+**Quantitative A/B (when a change is contested or two designs compete).** Beyond the
+qualitative friction report, you can put a number on it: run a fresh agent N times
+(N≈4) per condition on a task with a *checkable* answer and compare **pass-rate**
+first, novel-token cost second. Conditions: **A** = artifacts stripped, **B1** =
+artifacts present + told to read the manual, **B2** = artifacts present, self-discover
+(B2≈A means the agent never found the manual — a read-path failure, Principle 2). For
+the token figure, read the reasoning model's *intake (input + cache-creation) + output*
+from the run's structured usage (e.g. `--output-format json`, per-model block); exclude
+cache reads and any background helper model. **Decisive caveat:** at *equal success* on
+small, well-documented repos the token delta saturates to ≈neutral — the agent solves
+from source regardless — so a flat token result does **not** mean the artifact is
+worthless. The artifact's value shows up in the **failure regime**: inject the exact
+condition it targets (an *unverifiable* doc/code drift, or *missing* domain residue) and
+measure pass-rate there. Lead with correctness; use tokens only to break ties between
+designs that both pass.
+
 ---
 
 ## Notes
