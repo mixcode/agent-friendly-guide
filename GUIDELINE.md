@@ -191,7 +191,9 @@ lands on. This is its own principle because the intuitive answer is usually wron
   and you cannot bait them to a separate doc by placement or naming.** In a small repo
   they read essentially everything; in a doc-rich repo they `ls`, read the files whose
   *names* look relevant to the task (the examples, a task-named reference doc, the
-  source), get enough, and **stop**. A bolt-on manual — `llms-full.txt`, `AGENTS.md`,
+  source), get enough, and **stop**. A bolt-on manual — `llms-full.txt` (the full-text
+  agent manual in the `llms.txt` convention: an `llms.txt` index pointing to a fuller
+  `llms-full.txt`; developed in Principle 6), `AGENTS.md`,
   even a file literally named `read_first_for_coding_agent.md` — is **skipped** once the
   task-relevant reads satisfy the agent. No filename, convention, or imperative draws it
   in.
@@ -295,7 +297,7 @@ reference (`llms.txt` index + `llms-full.txt`) **inside the repo**, as the manua
 the *human-prompted* "read the manual" case (not the thing a self-directed agent will
 open — that's Principle 2). Whether it reaches the consumer depends on the ecosystem's
 **distribution model** — free for some, opt-in for others, and for some the artifact
-*is* the repo/binary; see §2's "languages and ecosystems."
+*is* the repo/binary; see §2's "A note on languages and ecosystems."
 
 **Write it as a lean *delta* over existing docs — and aim the delta at the *domain
 residue*.** Don't restate docs that are already good; a manual duplicating an excellent
@@ -359,7 +361,9 @@ felt. Two axes, in priority order:
 2. **Cost (the secondary signal).** Count the **novel tokens** the reasoning model
    processes — *intake* (input + cache-creation) **plus** output — and **exclude**
    cache *reads* (re-reading the same context is nearly free) and any smaller
-   background/helper model. Read it from the run's structured usage, not a guess: an
+   background/helper model (many agent harnesses run a cheaper model for side tasks
+   like summarization — count only the model doing the reasoning). Read it from the
+   run's structured usage, not a guess: an
    agent CLI that emits machine-readable usage (e.g. a JSON run-summary with a
    per-model token block) gives you the figure per condition. Compare medians; with
    small N a rank test (Mann–Whitney U) tells you whether a gap is real or noise.
