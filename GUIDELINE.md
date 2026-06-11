@@ -25,13 +25,13 @@ Two audiences you are writing for, and they need different things:
 
 And two levels of effort, with very different payoff curves:
 
-- **Doc-level** (principles 1–4, 6): cheap, applies to any repo, large immediate
+- **Doc-level** (principles 1–2, 4–7): cheap, applies to any repo, large immediate
   return. Start here.
-- **Design-level** (principle 5): changing the API/code itself so it is hard to
+- **Design-level** (principle 3): changing the API/code itself so it is hard to
   misuse. Higher effort, highest ceiling. This is where "agent-friendly" stops
   being about documentation.
 
-The feedback loop (principle 7) is what tells you when you're done.
+The feedback loop (principle 8) is what tells you when you're done.
 
 ### Repo types — what "consume" means
 
@@ -60,11 +60,13 @@ Cutting across every type, an agent must do three things — make each easy:
   underweighted dimension, and it is exactly what tool use hinges on.
 - **Use** — invoke it correctly the first time (traps, recipes, error legibility).
 
-The seven principles serve all three; **find** and **select** both live in
-principle 1 — including the fact that an agent's *default discovery path is
-type-specific* (a library's agent reads in-language docs and examples first; a
-tool's agent reads the README / `--help`), so the manual's content must sit where
-*that* type's agent actually looks.
+The eight principles serve all three; **find** is now principle 2 (put content on
+the agent's *verified* read path) and **select** is principle 6 (the selection
+surface) — the key fact being that an agent reads a *task-specific, repo-specific*
+set of surfaces (a library's agent gravitates to examples, a task-named reference
+doc, and the source; a tool's agent to the README / `--help`) and you must put the
+content where *that* agent is **observed** to look — not where you assume it looks
+(it is often *not* `doc.go`).
 
 ### Decide by contract legibility, not repo type alone
 
@@ -85,11 +87,24 @@ repo's type label — is what determines where agent-readiness pays off.
   godoc/docstrings directly and reconstructs the contract cheaply — so a separate
   manual is a near-empty delta (neutral when ignored, a tax when forced). The
   leverage is **making the read surface true and complete enough**: accurate
-  godoc/docstrings, zero drift (principle 2), a clear selection surface, and inlined
+  godoc/docstrings, zero drift (principle 1), a clear selection surface, and inlined
   traps where the API has a sharp edge — not a parallel manual.
 
-The **selection surface** (principle 1) and the **contributor guide** (`AGENTS.txt`,
-principle 6) are worth it *either way* — reading the API tells an agent *how* to
+**"Legible" includes more than the code body — subtract the *API names* and the
+*agent's training prior* too.** Well-named parameters and types advertise the contract
+(an agent infers `arrayRepeat`, `spineBlank`, or `timeout_ms` from the name alone), and
+the agent already *knows* general facts (manga reads right-to-left; HTTP 404 = not
+found). So the manual's **irreducible value is the residue**: project-specific,
+non-obvious **domain/cultural knowledge** that is in *neither* the code, the API names,
+*nor* the agent's prior — house conventions, units/encodings, business rules, the *why*
+behind a deliberate wart, binding/locale/format quirks. That is the one thing a manual
+supplies that nothing else can. (Measured: when such a convention was unguessable and
+counter-prior, agents failed it 0/4 without the manual and 4/4 with it; when it leaked
+through well-named knobs, the manual added little.) Spend the manual's words on the
+residue — not on restating signatures the agent reads or facts it already has.
+
+The **selection surface** (principle 6) and the **contributor guide** (`AGENTS.txt`,
+principle 7) are worth it *either way* — reading the API tells an agent *how* to
 call the thing, not *whether* it should, nor how to safely *modify* it.
 
 In our testing this held across repos and languages: agent-readiness artifacts cut
@@ -99,85 +114,15 @@ legible) — agents are source-first and won't open a manual they don't need.
 
 ---
 
-## 2. The method — seven principles
+## 2. The method — eight principles
 
-### Principle 1 — Find & select: an entry point an agent can reach and choose
+**Ordered by leverage** (what actually moves an agent's success, per the evaluation
+record): keeping the read surface *true* and the API *unmissable* comes first;
+shipping/finding a separate manual comes last, because agents read the code's own
+surfaces and can't be reliably steered to a bolt-on doc. The `find → select → use`
+lens is a cross-cutting view, not this ordering.
 
-This principle covers the first two of find/select/use. **Find** is discoverability —
-the machine-readable entry point below. **Select** is the *selection surface* — how
-the agent decides this is the right thing for the job.
-
-Ship a dedicated agent manual **inside the repo**, not only on a docs site.
-
-- `llms.txt` — a short index page (the emerging convention; see https://llms.txt.org)
-  pointing at the deeper docs.
-- `llms-full.txt` — the full manual: a syntax/API cheat sheet, the crucial rules
-  and constraints, the documented traps (principle 3), copy-pasteable recipes
-  (principle 4), debugging guidance, and error diagnosis.
-
-Why *in the repo*: when your package is fetched (vendored into the module cache,
-cloned, installed), the agent finds the manual with a single `ls` — no network
-round-trip to a docs site, no guessing. In testing, the evaluating agent
-called this out explicitly as the single biggest reason it never had to read
-library source to make things work. **Whether the manual actually reaches the
-consumer depends on the ecosystem's distribution model** — for some it's free,
-for others you must opt it into the package, and for some the artifact *is* the
-repo/binary; see the distribution taxonomy in §2's "languages and ecosystems."
-
-Then make it **discoverable** from the places an agent already lands:
-- A callout at the top of the README (`> [!NOTE] AI Agents: read llms-full.txt`).
-- A one-line pointer at the top of the in-language doc comment (Go `doc.go`,
-  module docstring, etc.) to the raw URL of `llms-full.txt`.
-- Optionally a badge.
-
-**Discoverability is repo-type-specific — meet the agent on its default path.**
-An agent's first move depends on what it's consuming, and a manual it never opens
-saves it nothing. Observed behaviour: on a **library**, clean agents go to the
-in-language docs (godoc/pkg.go.dev, docstrings) and the source/examples first —
-they do **not** open a root `llms.txt` on their own, and frequently won't even
-follow a godoc → `llms-full.txt` *link* once the godoc itself answers them. On a
-**CLI / tool / service / MCP server**, agents do reach for the README / `--help` /
-root docs, so a manual there is on the path. The consequence:
-
-- **Library:** put the decisive **traps and the one canonical recipe *inline* in
-  the in-language doc surface and a runnable example** (a Go `Example` test, a
-  docstring sample) — the surface the agent actually reads — not merely linked
-  from it. `llms-full.txt` remains the exhaustive reference for the case where a
-  human *tells* the agent to read it.
-- **CLI / tool / service / MCP:** the root manual (plus `--help` / the
-  `description`) is the agent's path; lead it there.
-
-**Write the manual as the *delta* over existing docs, and keep it lean.** Before
-authoring, assess what the conventional docs (godoc, README, a spec) already give
-an agent and spend effort on the **gap** — don't restate docs that are already
-good. A manual that duplicates an already-excellent godoc is dead weight: the
-agent won't open it unprompted, and if forced to, the extra tokens buy nothing.
-(Measured: a ~8k-token manual that merely duplicated a library's already-strong
-godoc *raised* an agent's token cost ~20% when it was forced to read it and was
-ignored entirely when it wasn't; a focused ~1k-token CLI manual *cut* cost ~35%.)
-Front-load the decisive traps and recipe so an agent that does open it hits the
-high-value content first; link out to the good existing docs for the rest.
-
-**Discoverability-first — invite, never force.** Make the manual findable and let
-the agent pull what it needs. Do **not** wire a rule/hook that commands "read
-`llms-full.txt` first" on every task: forcing a read is at best neutral and, for a
-repo with good in-language docs, measurably counterproductive.
-
-**Selection surface (so the agent picks you for the right job).** Discoverability
-gets the agent *to* you; the selection surface gets it to use you *correctly*.
-State, where the agent looks first:
-- **what it's for in one line, and what it's *not* for** — scope and limits;
-- the **trigger phrases / when-to-use** matching how an agent would describe the
-  task. For a skill or MCP tool this is the `description`; for a CLI, the purpose
-  line in `--help`; for a library, the README's opening sentence.
-
-A precise "use when / not for" prevents both non-use (the agent never picks you)
-and misuse (it picks you for the wrong job). This matters most for **tools**, where
-the agent chooses among many at invocation time. Worked example: the `agent-ready`
-skill's `description` — verb-first, with the trigger phrases an agent would think
-in ("make a repo agent-friendly", "add llms.txt").
-
-### Principle 2 — One source of truth, zero drift
+### Principle 1 — One source of truth, zero drift
 
 Designate one **ground truth** for behavior and make every other doc agree with
 it. Drift is worse than missing docs: an agent that trusts a confident-but-wrong
@@ -189,6 +134,14 @@ agent trusts it and fails, often silently, never checking the code. So for a
 source-shipped library (where, per "decide by contract legibility," the read
 surface *is* the lever), **eliminating drift between code, comments, and docs is
 the highest-value agent-readiness work — above writing any separate manual.**
+
+This is the deepest form of the whole method: agent-friendliness is **a property of
+the code composition itself** — accurate signatures, true docstrings/comments,
+honest examples — not a manual bolted on beside it. Testing made this stark: agents
+can't be reliably steered to a separate doc by placement *or* naming (they read the
+task-relevant surfaces and stop), but they *will* trust whatever those surfaces say
+— so the surfaces being **intrinsically drift-free** is what actually moves an
+agent's success. Invest there first.
 
 Ground truth is usually **the code and its in-language docs (godoc/docstrings)** —
 for a simple library that *is* the authority, and the agent manual derives from
@@ -207,7 +160,61 @@ than creating a new document.
 - If you maintain translated docs, keep them at parity or mark them as possibly
   stale; a half-updated translation is a drift source.
 
-### Principle 3 — Name the traps; don't hide them
+### Principle 2 — Place critical content on the agent's *verified* read path
+
+A true read surface (Principle 1) only helps if it is the surface the agent actually
+lands on. This is its own principle because the intuitive answer is usually wrong:
+
+- **Agents find docs by `ls` + *filename* (task-relevance), not by grepping content —
+  and you cannot bait them to a separate doc by placement or naming.** In a small repo
+  they read essentially everything; in a doc-rich repo they `ls`, read the files whose
+  *names* look relevant to the task (the examples, a task-named reference doc, the
+  source), get enough, and **stop**. A bolt-on manual — `llms-full.txt`, `AGENTS.md`,
+  even a file literally named `read_first_for_coding_agent.md` — is **skipped** once the
+  task-relevant reads satisfy the agent. No filename, convention, or imperative draws it
+  in.
+- **The read surface is repo-specific — do not assume `doc.go`/godoc/README.** In
+  testing a library's agent went straight to the tag-reference doc and the `Example`
+  tests and **never opened `doc.go`**, so a pointer placed there was never seen.
+
+So the move is: **identify, empirically, the surfaces a clean agent reads for
+representative tasks** — watch what it opens in the clean-agent eval (Principle 8) — and
+put the decisive traps + canonical recipe **there**, inline and drift-free (Principle 1):
+
+- **Library:** the read path is commonly **runnable `Example` tests + a task-named
+  reference doc + the source** — verify which, don't assume. Inline the decisive content
+  there.
+- **CLI / tool / service / MCP:** agents reach for the README / `--help` / root docs /
+  tool `description` — the contract belongs there.
+
+A README callout and an in-doc pointer to a fuller manual are cheap and worth adding,
+but treat them as a **fallback**, not the mechanism — agents often don't follow them.
+Truth + correct placement is the whole game: a wrong surface fails silently; a true
+surface the agent never reads is wasted.
+
+### Principle 3 — Design the API to shrink the error surface (the deep lever)
+
+Docs reduce *mistakes about* the API; design reduces *the opportunity for*
+mistakes. This is where the biggest wins live, and it's the part teams skip.
+
+Three concrete moves:
+- **Eliminate manual bookkeeping.** When two things must always agree — a length
+  field and the data it sizes, a count and its list, a checksum and its payload —
+  derive one from the other automatically instead of making the caller keep them
+  in sync. The most error-prone step (a hand-maintained value that has to match
+  another field) simply disappears.
+- **Fail loud, with precise errors.** Make a failure say *where* and *what* — the
+  location/field and expected-vs-actual — not a generic "invalid input." A precise
+  error hands the agent (or human) the answer; a vague one sends it guessing.
+- **Make misuse hard or impossible.** Validate constraints early (at
+  construction/parse time) with a clear message; and if the same operation has
+  more than one implementation or mode, keep them behaviorally identical so there
+  are no per-mode surprises to memorize.
+
+Heuristic: every place your docs say "remember to…" is a candidate for a design
+change that removes the need to remember.
+
+### Principle 4 — Name the traps; don't hide them
 
 Every API has sharp edges. The agent-friendly move is to **document the sharp
 edge with the *why* and a rule**, not to pretend it isn't there (and not always
@@ -234,7 +241,7 @@ single-header `#define IMPLEMENTATION`-in-one-TU rules and inverted return codes
 status via exit codes (Shell), an install command in the README that doesn't
 match the real filename/manifest (any). See `languages/<lang>.md`.
 
-### Principle 4 — Recipes for the common path
+### Principle 5 — Recipes for the common path
 
 For the few patterns that cover most real usage, give a **copy-pasteable** recipe
 and put it where the agent looks (README + the agent manual + the tag/API
@@ -244,29 +251,46 @@ known-correct, copy-pasteable snippet. A recipe converts "the agent assembles th
 pattern from primitives and maybe gets it wrong" into "the agent copies a
 known-correct shape."
 
-### Principle 5 — Design the API to shrink the error surface (the deep lever)
+### Principle 6 — Selection surface & reach: help the agent choose, and make the reference travel
 
-Docs reduce *mistakes about* the API; design reduces *the opportunity for*
-mistakes. This is where the biggest wins live, and it's the part teams skip.
+Two durable jobs survive here once *placement* moves to Principle 2 — and this is
+**ranked low on purpose**: discoverability of a *separate* manual is the weakest lever.
 
-Three concrete moves:
-- **Eliminate manual bookkeeping.** When two things must always agree — a length
-  field and the data it sizes, a count and its list, a checksum and its payload —
-  derive one from the other automatically instead of making the caller keep them
-  in sync. The most error-prone step (a hand-maintained value that has to match
-  another field) simply disappears.
-- **Fail loud, with precise errors.** Make a failure say *where* and *what* — the
-  location/field and expected-vs-actual — not a generic "invalid input." A precise
-  error hands the agent (or human) the answer; a vague one sends it guessing.
-- **Make misuse hard or impossible.** Validate constraints early (at
-  construction/parse time) with a clear message; and if the same operation has
-  more than one implementation or mode, keep them behaviorally identical so there
-  are no per-mode surprises to memorize.
+**Selection surface (so the agent picks you for the right job).** Before *use* comes
+*select*. State, where the agent looks first:
+- **what it's for in one line, and what it's *not* for** — scope and limits;
+- the **trigger phrases / when-to-use** matching how an agent would describe the task.
+  For a skill or MCP tool this is the `description`; for a CLI, the purpose line in
+  `--help`; for a library, the README's opening sentence.
 
-Heuristic: every place your docs say "remember to…" is a candidate for a design
-change that removes the need to remember.
+A precise "use when / not for" prevents both non-use (the agent never picks you) and
+misuse (it picks you for the wrong job). This matters most for **tools**, where the
+agent chooses among many at invocation time. Worked example: the `agent-ready` skill's
+`description` — verb-first, with the trigger phrases an agent would think in.
 
-### Principle 6 — A contributor guide for agents (`AGENTS.txt`)
+**Reach — does the reference actually travel to the consumer?** Ship a dedicated
+reference (`llms.txt` index + `llms-full.txt`) **inside the repo**, as the manual for
+the *human-prompted* "read the manual" case (not the thing a self-directed agent will
+open — that's Principle 2). Whether it reaches the consumer depends on the ecosystem's
+**distribution model** — free for some, opt-in for others, and for some the artifact
+*is* the repo/binary; see §2's "languages and ecosystems."
+
+**Write it as a lean *delta* over existing docs — and aim the delta at the *domain
+residue*.** Don't restate docs that are already good; a manual duplicating an excellent
+godoc is dead weight (measured: a redundant ~8k-token manual *raised* an agent's cost
+~20% when forced, ignored when not; a focused ~1k-token CLI manual *cut* cost ~35%). The
+reference's irreducible content is the **project-specific domain/cultural knowledge that
+lives nowhere else** — in neither the code, the API names, nor the agent's training
+prior (per "decide by contract legibility"): house conventions, units/encodings,
+business rules, locale/binding/format quirks, the *why* behind a deliberate wart. Lead
+with that and the decisive traps/recipe; link out for everything the agent can already
+read or already knows.
+
+**Invite, never force.** Make the reference findable and let the agent pull; do **not**
+wire a rule/hook that commands "read `llms-full.txt` first" — at best neutral, and
+counterproductive for well-documented repos.
+
+### Principle 7 — A contributor guide for agents (`AGENTS.txt`)
 
 If you want agents to *extend* the code correctly, write down the invariants they
 must uphold. A common critical one: when the same behavior lives in more than one
@@ -281,7 +305,7 @@ that, the scaffolded contributor guide is `AGENTS.txt` — a plain-text sibling,
 with a self-describing header saying what it is. If the repo already has an
 `AGENTS.md` (or `CLAUDE.md`), **align with / point to it rather than duplicating**.
 
-### Principle 7 — Measure it with a clean-agent evaluation
+### Principle 8 — Measure it with a clean-agent evaluation
 
 You cannot judge agent-friendliness from the inside; you know too much. Run the
 loop:
@@ -297,6 +321,9 @@ This is the loop in action: a clean-agent build can score highly *and* surface a
 concrete capability or doc gap that becomes the next improvement. Treat the
 friction log as your backlog.
 
+The eval is also an **instrument, not just a grade**: watch *which files the agent
+opens* — that is how you discover its read path (Principle 2) — and note any claim it
+trusted that the code contradicts (drift, Principle 1). The friction log is your backlog.
 ### A note on languages and ecosystems
 
 The principles are language-agnostic, but the **cost** of each varies by ecosystem,
@@ -306,12 +333,14 @@ distribution model, below) and **which in-language surface the pointer goes in**
 (the doc surface — named per ecosystem in `languages/<lang>.md`). Validated across Go, Python, JS/TS, C,
 Rust, JVM, Shell, Swift, PHP, and Ruby.
 
-For a **library** in any of these ecosystems, that in-language doc surface (plus
-runnable examples) is the agent's **default discovery path** — it reads there
-before opening any separate manual — so the decisive traps and the canonical
-recipe belong *inline* there, not only linked from it (Principle 1). The
-per-language files name the surface; treat it as where the content lives, not just
-where a pointer goes.
+For a **library** in any of these ecosystems, the in-language doc surface and
+**runnable examples** are *among* the surfaces a library's agent reads — but which
+one it actually opens for a given task is repo-specific and must be **verified, not
+assumed**: in testing, agents preferred a task-named reference doc and the example
+tests and skipped the bare doc comment (`doc.go`) entirely. The per-language files
+name the *candidate* surfaces; put the decisive traps/recipe on the one(s) a clean
+agent is **observed** to read (Principles 1 and 2), inline and drift-free — not only as a
+pointer.
 
 #### The distribution model decides where the manual lives ("does the manual travel?")
 
@@ -360,7 +389,7 @@ clean-agent evaluation surface the ecosystem's quirks.
 
 #### Other cross-cutting notes
 
-- **Wire a formatter + linter into CI** (principle 2's drift defense) in any
+- **Wire a formatter + linter into CI** (principle 1's drift defense) in any
   ecosystem that doesn't hand you one (`gofmt`/`go vet` are Go-only freebies).
 - **The README isn't always at the repo root** (e.g. `.github/README.md`,
   `docs/`) — check there before concluding it's missing.
@@ -395,7 +424,7 @@ clean-agent evaluation surface the ecosystem's quirks.
   navigate to the right package. (The `agent-ready` skill's `--monorepo` mode surveys a
   workspace and writes this map; deep per-package work still runs one package at a
   time.)
-- **The clean-agent evaluation (principle 7) is the equalizer.** It surfaces
+- **The clean-agent evaluation (principle 8) is the equalizer.** It surfaces
   ecosystem-specific gaps — "the manual wasn't in the installed package," "there
   was no formatter so a generated change looked malformed" — regardless of
   language. When in doubt about a language's quirks, let the eval find them.
@@ -416,7 +445,7 @@ checklist automatically (see the README to install it).
 - [ ] `llms-full.txt` (or equivalent) present and complete.
 - [ ] README links the agent manual near the top (check non-root locations too: `.github/`, `docs/`).
 - [ ] In-language doc comment points to the raw manual URL (use the ecosystem's doc surface — see `languages/<lang>.md`).
-- [ ] **The decisive content is on the agent's *default path* for this repo type.** For a **library**, the key traps + the canonical recipe are reachable *inline in the in-language doc surface (godoc/docstring) and a runnable example* — not only inside (or linked from) a separate `llms-full.txt` that a library's agent won't open on its own.
+- [ ] **The decisive content is on the surface a clean agent is *observed* to read for representative tasks** (verify — don't assume `doc.go`/godoc). For a **library** that is commonly the **example tests + a task-named reference doc + the source**; inline the key traps + canonical recipe there, true and drift-free — not only inside (or linked from) a separate `llms-full.txt` the agent won't open on its own.
 - [ ] **The manual is a lean *delta* over existing docs**, not a restatement of already-good docs: it front-loads the traps/recipe and links out for the rest (a manual that duplicates an excellent godoc goes unread, and costs tokens for nothing if forced).
 - [ ] **The manual reaches the consumer per the repo's distribution model** (§2): for a registry **opt-in allowlist** (B) it's added (`package_data`/`MANIFEST.in`, npm `files`, JVM resources/`-javadoc` jar); for **ships-all** (A) it's at the package root (and not excluded by Rust `include` or `.gitattributes export-ignore`); when the **artifact is the repo/binary/single file** (D) it's shipped in-repo + in the in-file doc comment + man/release assets, and registry-bundling is marked **N/A** — for a single copied file (single-header C, one `.sh`) the pointer and key traps live *inside the file*.
 
@@ -445,7 +474,7 @@ Apply on top of the core checklist for the repo's type; mark inapplicable core
 items **N/A** with a reason rather than ❌.
 
 **Library / API** (consumed by *writing code against it*)
-- [ ] The agent's default path is the **in-language docs + examples**, not a root manual: the decisive traps and the canonical recipe are **inline in the doc surface (godoc/docstring/JSDoc) and a runnable example**, reachable without opening `llms-full.txt`.
+- [ ] The decisive traps and canonical recipe are on the surface the agent **actually reads** for the task — **verified empirically** (commonly the **example tests + a task-named reference doc + source**), not assumed to be `doc.go`/godoc, and reachable without opening `llms-full.txt`.
 - [ ] `llms-full.txt` is the *exhaustive* reference (for the "read the manual" case) and a **lean delta** over the in-language docs — not a duplicate of an already-good godoc.
 - [ ] **Select:** the README / doc-surface opening line states what it's for and *not* for, so an agent imports it for the right job.
 
@@ -484,6 +513,15 @@ items **N/A** with a reason rather than ❌.
 - **Forcing "read the manual first."** A rule/hook that mandates reading the
   manual on every task taxes the agent when it isn't needed (measurably so for
   well-documented libraries). Make the manual discoverable; let the agent pull.
+- **Trying to *attract* an agent to a separate manual by placement or naming.** A
+  bolt-on doc — any name, even `read_first_for_coding_agent.md`, even a perfect
+  task-domain name — gets skipped when the agent's task-relevant reads already
+  satisfy it. Agents are task- and sufficiency-driven; you can't bait them. Put the
+  content *on* the surface they read, don't hope a name pulls them off it.
+- **Assuming a fixed read surface (`doc.go`/godoc) without checking.** Agents pick
+  surfaces by task-relevance, and the right one is repo-specific; a pointer/content
+  placed on a surface the agent doesn't open is invisible. Verify with a clean-agent
+  eval which surfaces actually get read.
 
 ---
 

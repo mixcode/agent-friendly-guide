@@ -236,14 +236,20 @@ gaps. For any type, mark inapplicable core items **N/A** with a one-line reason
 (e.g. a docs/methodology repo has no "errors name the location" item) rather than
 forcing a ❌.
 
-**For a library, score the agent's *default path*, not just file presence.** A
-library's agent reads the in-language docs (godoc/docstrings) and examples first
-and often won't open a separate root manual on its own. So score Discoverability
-on whether the **decisive traps + canonical recipe are reachable inline on that
-path** (godoc/`doc.go`, a runnable example), and assess whether the **existing
-docs already serve the agent** — the highest-leverage gap is usually content the
-conventional docs *don't* carry, not a missing `llms-full.txt`. Flag a manual that
-is bloated or merely duplicates an already-good godoc as `present-but-weak`, not a ✅.
+**For a library, score the agent's *observed read surface*, not file presence —
+and don't assume it's `doc.go`.** A library's agent won't open a separate root
+manual on its own, and the surface it *does* read is repo-specific: in testing
+agents went to the example tests and a task-named reference doc and **skipped
+`doc.go` entirely**. So **identify, empirically, which surfaces a clean agent reads
+for a representative task** — the fastest way is the Phase-3 clean-agent eval (or a
+quick throwaway `claude -p` on a real task) and watch which files it opens; commonly
+the **example tests + a task-named reference doc + source**. Then score
+Discoverability on whether the **decisive traps + canonical recipe sit inline on
+those surfaces**, and whether the **existing docs already serve the agent** (the
+highest-leverage gap is content the read surfaces *don't* carry, not a missing
+`llms-full.txt`). Flag a manual that is bloated or merely duplicates a surface the
+agent already reads as `present-but-weak`, not a ✅. **Do not rely on a separate
+manual — or any filename — to attract the agent; it won't.**
 
 **Drift audit — the read surface vs the code (highest-value for legible-contract repos).**
 For every behavioral claim in the surface the agent actually reads — the
@@ -253,7 +259,7 @@ defaults, argument order, keyword names, valid value sets, return type/semantics
 and error conditions. **Trace into helpers/delegates where the real behavior lives**
 — do not assume a public docstring matches the implementation it calls. Any claim
 that contradicts the code is a **drift finding** and ranks at the **top** of the
-fix list: per principle 2 this is the asymmetric risk — a *wrong* doc makes an
+fix list: per principle 1 this is the asymmetric risk — a *wrong* doc makes an
 agent fail silently (it trusts the doc and never re-checks the code), whereas a
 *missing* doc only costs it some reading. Report each as
 `claim → actual code behavior → file:line`.
@@ -311,28 +317,32 @@ the manual is tool-facing, not an API cheat sheet — start from the
 not for"), then the **invocation contract** (commands/flags or tool name + input
 schema, auth/env), then **output and error legibility** and which operations
 mutate state. For a **library**, use `llms-full.txt` — the API cheat sheet +
-recipes lead — but because a library's agent reads the **in-language docs and
-examples first and often won't open a separate manual**, also **inline the
-decisive traps and the one canonical recipe into the doc surface** (godoc/`doc.go`,
-a docstring) **and add or annotate a runnable example** (a Go `Example` test) that
-shows the trap-prone path. Keep `llms-full.txt` a **lean delta** over the existing
-docs — front-load the traps/recipe and link out to good existing docs; don't
-restate an already-complete godoc (a bloated, redundant manual just goes unread,
-and wastes the agent's tokens if it's ever forced to read it).
+recipes lead — but because a library's agent **reads the task-relevant surfaces and
+won't open a separate manual on its own**, the real work is to **inline the decisive
+traps and the one canonical recipe onto the surface(s) the agent was *observed* to
+read in Phase 1** — commonly an **annotated runnable example** (a Go `Example` test)
+and a **task-named reference doc**, and the in-language doc comment *only if* the
+agent actually reads it (don't default to `doc.go`). Make those surfaces **true and
+drift-free** (fix-drift step above). Keep `llms-full.txt` a **lean delta** for the
+human-prompted case, and **aim that delta at the domain residue** — the
+project-specific knowledge that's in neither the code, the API names, nor the agent's
+training prior: house conventions, units/encodings, business rules, locale/binding/
+format quirks, the *why* behind a deliberate wart. Don't restate signatures the agent
+reads or general facts it already knows (a bloated, redundant manual goes unread, and
+wastes tokens if forced).
 
-Then wire **discoverability** (the cheapest, highest-return fixes):
+Then wire **discoverability** — but treat pointers as a *fallback*, not the
+mechanism (testing shows agents often don't follow them; the lever is content on the
+read surface):
 - Add a short callout near the top of the README pointing to `llms-full.txt`
-  (in a hand-edited region, not a generated one; if the README lives in
-  `.github/`, edit it there).
-- Add a one-line pointer in the ecosystem's in-language doc surface to the raw
-  manual URL (see `languages/<lang>.md` for which surface).
-- For a **library**, the *inline* traps/recipe in the doc surface + example
-  (above) are the **primary** discoverability surface; the raw-URL pointer is a
-  fallback an agent may not follow once the godoc answers it. Spend the effort
-  inline, not just on the pointer.
+  (hand-edited region, not generated; if the README lives in `.github/`, edit there).
+- Add a one-line pointer in the in-language doc comment to the raw manual URL (see
+  `languages/<lang>.md`) — cheap insurance, but **do not rely on it**.
+- The **primary** move is the inlined traps/recipe on the agent's observed read
+  surface (above). Do **not** try to attract the agent with a clever or imperative
+  manual filename — it doesn't work; spend the effort on the read surface.
 - **Never** wire a rule/hook (CLAUDE.md, a pre-task instruction) that forces "read
-  `llms-full.txt` first" — make it findable and let the agent pull; forcing a read
-  is at best neutral and counterproductive for well-documented libraries.
+  `llms-full.txt` first" — at best neutral, counterproductive for well-documented repos.
 
 If the audit found a clear "common pattern," draft a copy-pasteable **recipe**
 for it (or a `{TODO}` recipe stub if you can't verify the API).

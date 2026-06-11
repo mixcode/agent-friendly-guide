@@ -15,7 +15,7 @@ results, and tested across ten language ecosystems.
 
 ## Contents
 
-- **[GUIDELINE.md](GUIDELINE.md)** — the method: seven principles, an audit
+- **[GUIDELINE.md](GUIDELINE.md)** — the method: eight principles, an audit
   checklist, anti-patterns, and language/ecosystem notes. Start here.
 - **[templates/](templates/)** — fill-in skeletons for `llms.txt`,
   `llms-full.txt`, `llms-full-cli.txt` (the CLI/tool-facing manual),
