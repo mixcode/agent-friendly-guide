@@ -13,8 +13,8 @@ read GUIDELINE.md; to *run* the tooling, install the plugin and use the
 
 This repo is both a **methodology** and a **Claude Code plugin**:
 
-- `GUIDELINE.md` — the method (7 principles, the audit checklist, anti-patterns).
-  **This is the source of truth.**
+- `GUIDELINE.md` — the method (the contract-legibility diagnostic, the work in
+  leverage order, the audit checklist, anti-patterns). **This is the source of truth.**
 - `README.md` — overview, the short version, and skill install/usage.
 - `templates/` — fill-in skeletons (`llms.txt`, `llms-full.txt`,
   `llms-full-cli.txt` for CLI/tool repos, `llms-monorepo.txt` for a monorepo
