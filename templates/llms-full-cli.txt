@@ -17,7 +17,7 @@ HOW TO USE THIS TEMPLATE (CLI / tool-facing manual)
   selection surface, the traps, the headless recipe). Don't transcribe every flag.
 - Fill each section from verified facts; delete genuinely-inapplicable ones.
 - Ship it so it reaches the consumer per the repo's distribution model
-  (GUIDELINE §2): packaged-allowlist → add it; binary/repo-is-the-artifact →
+  (GUIDELINE §4a): packaged-allowlist → add it; binary/repo-is-the-artifact →
   keep it in the repo + release assets and point to it from the README/--help.
 - For an MCP server, the real "manual" is largely the in-protocol tools/list
   (descriptions + input schemas + annotations); make those complete, and use the

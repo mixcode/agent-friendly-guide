@@ -87,8 +87,8 @@ The arguments may include a mode switch. Pick the stopping point:
   (below) over the native doc surface, then **correct every contradiction against
   the code** (Phase 2's "fix drift first"), and stop. Do **not** scaffold a manual.
   This is the highest-value pass for a well-documented, source-shipped library —
-  where the read surface, not a manual, is the lever (see GUIDELINE "decide by
-  contract legibility").
+  where the read surface, not a manual, is the lever (see GUIDELINE §2a, "is the
+  contract legible?").
 
 State the target repo and the mode in one line before you start.
 
@@ -207,7 +207,7 @@ Detect first:
   `php`, `ruby`) — it
   gives that ecosystem's detection signals, doc surface, distribution model, and
   traps. If there's no file for the language, fall back to the agnostic guidance
-  and the **distribution model** taxonomy in GUIDELINE §2 (A ships-all / B opt-in
+  and the **distribution model** taxonomy in GUIDELINE §4a (A ships-all / B opt-in
   allowlist / C git-URL / D repo-binary-file-is-the-artifact) — this tells you
   where the manual must live to reach the consumer.
 - Entry-point docs: README (also check non-root locations — `.github/README.md`,
@@ -222,13 +222,13 @@ Detect first:
   will drift from it.
 
 Then score the repo against the **agent-readiness checklist**, which lives in one
-place: `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md` §3 ("The audit checklist"). **Read it
+place: `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md` §5 ("The audit checklist"). **Read it
 now** and score each item ✅ good / ⚠️ weak / ❌ missing with a one-line note. Its
 groups are *Discoverability*, *Correctness & trust*, *Usability*,
 *Contributor-readiness*, and *Evidence* — use them as section headers in your
 report.
 
-**Apply the type overlay.** §3 ends with **Type overlays** (CLI tool, MCP server).
+**Apply the type overlay.** §5 ends with **Type overlays** (CLI tool, MCP server).
 If the repo is one of those, score its overlay items too — for tools the
 selection surface (a clear "use when / not for"), the invocation contract, output
 and error legibility, and read-vs-mutating clarity are usually the highest-value
@@ -259,7 +259,7 @@ defaults, argument order, keyword names, valid value sets, return type/semantics
 and error conditions. **Trace into helpers/delegates where the real behavior lives**
 — do not assume a public docstring matches the implementation it calls. Any claim
 that contradicts the code is a **drift finding** and ranks at the **top** of the
-fix list: per principle 1 this is the asymmetric risk — a *wrong* doc makes an
+fix list: per GUIDELINE §3a this is the asymmetric risk — a *wrong* doc makes an
 agent fail silently (it trusts the doc and never re-checks the code), whereas a
 *missing* doc only costs it some reading. Report each as
 `claim → actual code behavior → file:line`.
@@ -294,7 +294,7 @@ plus `llms-full-cli.txt` for a CLI/tool — see below). For each:
    the member's subdir for a workspace member — see "Target repository"; confirm
    first if it already exists), then
    **make it reach the consumer per the distribution model** (Phase 1 / GUIDELINE
-   §2): for an **opt-in allowlist** (B) add it to `package_data`/`MANIFEST.in` /
+   §4a): for an **opt-in allowlist** (B) add it to `package_data`/`MANIFEST.in` /
    npm `files` / JVM resources; for a **single copied file** (D: single-header C,
    one `.sh`) put the pointer **and the key traps inside that file**, since a
    separate `llms-full.txt` won't travel with it. For files that already exist
@@ -391,7 +391,7 @@ qualitative friction report, you can put a number on it: run a fresh agent N tim
 (N≈4) per condition on a task with a *checkable* answer and compare **pass-rate**
 first, novel-token cost second. Conditions: **A** = artifacts stripped, **B1** =
 artifacts present + told to read the manual, **B2** = artifacts present, self-discover
-(B2≈A means the agent never found the manual — a read-path failure, Principle 2). For
+(B2≈A means the agent never found the manual — a read-path failure, GUIDELINE §3a). For
 the token figure, read the reasoning model's *intake (input + cache-creation) + output*
 from the run's structured usage (e.g. `--output-format json`, per-model block); exclude
 cache reads and any background helper model. **Decisive caveat:** at *equal success* on

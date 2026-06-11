@@ -1,6 +1,6 @@
 # The Clean-Agent Evaluation
 
-The feedback loop of the method (principle 7). You cannot judge your own repo's
+The feedback loop of the method (GUIDELINE §3f). You cannot judge your own repo's
 agent-friendliness from the inside — you know too much. This harness has a
 **fresh agent**, with no prior context, build something real using only your
 **published** artifacts, and report exactly where it struggled.

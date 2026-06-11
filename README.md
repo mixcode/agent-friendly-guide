@@ -15,8 +15,9 @@ results, and tested across ten language ecosystems.
 
 ## Contents
 
-- **[GUIDELINE.md](GUIDELINE.md)** — the method: eight principles, an audit
-  checklist, anti-patterns, and language/ecosystem notes. Start here.
+- **[GUIDELINE.md](GUIDELINE.md)** — the method: a contract-legibility diagnostic,
+  the work in leverage order, an audit checklist, anti-patterns, and
+  language/ecosystem notes. Start here.
 - **[templates/](templates/)** — fill-in skeletons for `llms.txt`,
   `llms-full.txt`, `llms-full-cli.txt` (the CLI/tool-facing manual),
   `llms-monorepo.txt` (a monorepo root's package map), and `AGENTS.txt`.

@@ -31,7 +31,7 @@ This repo is both a **methodology** and a **Claude Code plugin**:
 - **`GUIDELINE.md` is the source of truth.** `SKILL.md`, the templates, and the
   README all *derive* from it — when the method changes, change `GUIDELINE.md`
   and bring the others into line in the same commit.
-- **The audit checklist lives in exactly one place: `GUIDELINE.md` §3.** `SKILL.md`
+- **The audit checklist lives in exactly one place: `GUIDELINE.md` §5.** `SKILL.md`
   Phase 1 *references* it (via `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md`) and must not
   re-embed its own copy. (They drifted once; that's why this rule exists.)
 - **The skill reads bundled assets via `${CLAUDE_PLUGIN_ROOT}`** (`GUIDELINE.md`,
