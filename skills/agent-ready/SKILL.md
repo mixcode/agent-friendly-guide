@@ -10,13 +10,22 @@ Make a target repository agent-friendly, following the method in
 `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md` (read it if you need the full rationale; the
 operational steps are below).
 
-**Preflight.** This skill reads its checklist, templates, language guides, and
-evaluation harness from `${CLAUDE_PLUGIN_ROOT}`. If that variable is empty, or
-`${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md` is unreadable (e.g. the skill was bare-copied
-without the plugin), **stop and tell the user to install the plugin** —
+**Plugin root (harness-agnostic).** This skill reads its checklist, templates,
+language guides, and evaluation harness from the **plugin root** — the directory that
+contains `GUIDELINE.md`, `templates/`, `languages/`, and `evaluation/`. On Claude Code
+that root is `${CLAUDE_PLUGIN_ROOT}`; on any other agent harness it is the installed
+plugin's directory (typically the parent of this skill's `skills/agent-ready/`).
+**Resolve it first**, then read from it. Throughout this file, `${CLAUDE_PLUGIN_ROOT}`
+is shorthand for that root — substitute your harness's path if the variable is unset.
+
+**Preflight.** If you cannot locate the plugin root, or `GUIDELINE.md` is unreadable
+there (e.g. the skill was bare-copied, or your harness imported only the skill
+component without the rest of the plugin), **stop and tell the user to make the full
+plugin available** rather than proceeding with missing guidance — on Claude Code:
 `/plugin marketplace add mixcode/agent-friendly-guide` then
-`/plugin install agent-friendly-guide@agent-friendly-guide` — rather than
-proceeding with missing guidance.
+`/plugin install agent-friendly-guide@agent-friendly-guide`; on other harnesses, ensure
+the repo's `GUIDELINE.md` / `templates/` / `languages/` / `evaluation/` are reachable
+beside the skill (see the README's "Other agent harnesses" note).
 
 ## Target repository
 
