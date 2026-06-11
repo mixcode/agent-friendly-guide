@@ -20,12 +20,22 @@ is shorthand for that root — substitute your harness's path if the variable is
 
 **Preflight.** If you cannot locate the plugin root, or `GUIDELINE.md` is unreadable
 there (e.g. the skill was bare-copied, or your harness imported only the skill
-component without the rest of the plugin), **stop and tell the user to make the full
-plugin available** rather than proceeding with missing guidance — on Claude Code:
-`/plugin marketplace add mixcode/agent-friendly-guide` then
-`/plugin install agent-friendly-guide@agent-friendly-guide`; on other harnesses, ensure
-the repo's `GUIDELINE.md` / `templates/` / `languages/` / `evaluation/` are reachable
-beside the skill (see the README's "Other agent harnesses" note).
+component without the rest of the plugin), recover in this order:
+
+1. **If you can fetch URLs**, read the missing support files directly from the published
+   release — **pinned to *this* skill's version** so the guide always matches the skill
+   (never fetch `main`; an unpinned guide may have moved past this version and would be
+   drift). Read the `version` from the sibling `.claude-plugin/plugin.json` and fetch
+   from `https://raw.githubusercontent.com/mixcode/agent-friendly-guide/v<version>/<path>`
+   — e.g. for version `0.3.9`: `…/v0.3.9/GUIDELINE.md`, `…/v0.3.9/languages/<lang>.md`,
+   `…/v0.3.9/templates/llms-full.txt`. Fetch **only what you need** (the guide, the one
+   language file for this repo, and the templates you'll fill) — not the whole tree.
+2. **Otherwise** (no web access, or the version is unknown), **stop and tell the user to
+   make the full plugin available** rather than proceeding with missing guidance — on
+   Claude Code: `/plugin marketplace add mixcode/agent-friendly-guide` then
+   `/plugin install agent-friendly-guide@agent-friendly-guide`; on other harnesses,
+   ensure the repo's `GUIDELINE.md` / `templates/` / `languages/` / `evaluation/` are
+   reachable beside the skill (see the README's "Other agent harnesses" note).
 
 ## Target repository
 
