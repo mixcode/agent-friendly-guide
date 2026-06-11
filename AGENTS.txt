@@ -35,8 +35,15 @@ This repo is both a **methodology** and a **Claude Code plugin**:
   Phase 1 *references* it (via `${CLAUDE_PLUGIN_ROOT}/GUIDELINE.md`) and must not
   re-embed its own copy. (They drifted once; that's why this rule exists.)
 - **The skill reads bundled assets via `${CLAUDE_PLUGIN_ROOT}`** (`GUIDELINE.md`,
-  `templates/`, `evaluation/`). Keep those paths valid; the skill is not designed
-  to run as a bare standalone copy.
+  `templates/`, `evaluation/`). Keep those paths valid. If they're missing (a
+  skill-only harness import), the skill self-recovers by fetching from the
+  version-pinned release URL — see the Preflight in `SKILL.md`.
+- **Release coupling: bump the version in TWO places, and tag.** Every publish must
+  update `version` in `.claude-plugin/plugin.json` **and** the embedded release tag in
+  `SKILL.md`'s Preflight fetch URL (`.../v<version>/...`), then `git tag v<version>`
+  and `git push --tags`. If these drift, a skill-only harness fetches the wrong (older)
+  guide. The embedded literal is deliberate: harnesses like Antigravity strip
+  `plugin.json`'s version on import, so the skill can't read it at runtime.
 - **Keep examples language-agnostic; never name or link a real external repo** in
   the guide, skill, or templates. A skill-running agent will fetch and read any
   named project, wasting effort on something the abstract rule already teaches.

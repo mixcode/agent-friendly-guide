@@ -75,7 +75,7 @@ it runs on any harness that can (1) load a skill and (2) let that skill read the
 support files (`GUIDELINE.md`, `templates/`, `languages/`, `evaluation/`). Harnesses that
 import *only* the skill component need those files placed alongside the skill.
 
-From **v0.3.9** the skill self-recovers: if a harness imported only the skill component
+From **v0.3.10** the skill self-recovers: if a harness imported only the skill component
 and you have web access, it fetches the missing support files directly from the
 published release, **version-pinned** to the skill (so the guide always matches). The
 clone+symlink below is then only needed for **offline / no-web** harnesses.

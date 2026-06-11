@@ -23,13 +23,15 @@ there (e.g. the skill was bare-copied, or your harness imported only the skill
 component without the rest of the plugin), recover in this order:
 
 1. **If you can fetch URLs**, read the missing support files directly from the published
-   release — **pinned to *this* skill's version** so the guide always matches the skill
-   (never fetch `main`; an unpinned guide may have moved past this version and would be
-   drift). Read the `version` from the sibling `.claude-plugin/plugin.json` and fetch
-   from `https://raw.githubusercontent.com/mixcode/agent-friendly-guide/v<version>/<path>`
-   — e.g. for version `0.3.9`: `…/v0.3.9/GUIDELINE.md`, `…/v0.3.9/languages/<lang>.md`,
-   `…/v0.3.9/templates/llms-full.txt`. Fetch **only what you need** (the guide, the one
+   release. **This skill is release `v0.3.10`** — fetch from that matching tag so the
+   guide can't drift past the skill:
+   `https://raw.githubusercontent.com/mixcode/agent-friendly-guide/v0.3.10/<path>` — e.g.
+   `…/v0.3.10/GUIDELINE.md`, `…/v0.3.10/languages/<lang>.md`,
+   `…/v0.3.10/templates/llms-full.txt`. **Never fetch `main`** (it may have moved past
+   this version — that would be drift). Fetch **only what you need** (the guide, the one
    language file for this repo, and the templates you'll fill) — not the whole tree.
+   (The version literal above is this skill's own release tag; it is bumped with each
+   publish.)
 2. **Otherwise** (no web access, or the version is unknown), **stop and tell the user to
    make the full plugin available** rather than proceeding with missing guidance — on
    Claude Code: `/plugin marketplace add mixcode/agent-friendly-guide` then
