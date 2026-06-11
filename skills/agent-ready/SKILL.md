@@ -228,7 +228,7 @@ groups are *Discoverability*, *Correctness & trust*, *Usability*,
 *Contributor-readiness*, and *Evidence* — use them as section headers in your
 report.
 
-**Apply the type overlay.** §5 ends with **Type overlays** (CLI tool, MCP server).
+**Apply the type overlay.** §5 ends with **Type overlays** (Library / API, CLI tool, MCP server).
 If the repo is one of those, score its overlay items too — for tools the
 selection surface (a clear "use when / not for"), the invocation contract, output
 and error legibility, and read-vs-mutating clarity are usually the highest-value

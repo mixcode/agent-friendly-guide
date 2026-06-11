@@ -27,7 +27,7 @@ HOW TO USE THIS TEMPLATE
 - Every claim must match the code and ground-truth spec (no drift). Ship it IN the
   repo and make sure it travels with the published package (module vendoring / npm
   "files" / Python package data / crate include). Validate it with the clean-agent
-  evaluation (see the guide's evaluation/).
+  evaluation (see GUIDELINE §3f).
 -->
 
 ---

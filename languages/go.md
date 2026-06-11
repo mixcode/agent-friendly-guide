@@ -16,14 +16,17 @@ agnostic `GUIDELINE.md`. Go is the most-validated ecosystem and the easiest case
   own manual (not only a map).
 
 ## Doc surface (where the manual content lives — not just a pointer)
-- Library: the package doc comment / `doc.go` (rendered by `go doc` and
-  pkg.go.dev) **plus `Example` functions in `*_test.go`** (also rendered on
-  pkg.go.dev). This is the agent's **default discovery path** — it reads godoc and
-  examples before opening any separate manual, and often won't follow a `doc.go →
-  llms-full.txt` link once godoc answers it. So **inline the decisive traps and the
-  one canonical recipe here** — in `doc.go` and a runnable `Example` — not only as
-  a pointer. Put the one-line raw-`llms-full.txt` pointer at the top of `doc.go`
-  too, but treat it as a fallback, not the primary surface.
+- Library: the *candidate* surfaces are the package doc comment / `doc.go`,
+  **`Example` functions in `*_test.go`**, a **task-named reference doc**, and the
+  source (godoc and examples both render on pkg.go.dev). **Don't assume `doc.go` is
+  the one the agent opens** — verify it (GUIDELINE §3a, "verified read path"): in
+  testing, agents went to the example tests + a task-named reference doc and **never
+  opened `doc.go`**, so a pointer placed there was never seen (GUIDELINE Appendix A,
+  E6). So **inline the decisive traps and the one canonical recipe on the surface(s)
+  a clean agent is *observed* to read** — commonly a runnable `Example` plus the
+  task-named doc — not only as a pointer, and not assumed into `doc.go`. Add the
+  one-line raw-`llms-full.txt` pointer at the top of `doc.go` too, but treat it as a
+  fallback, not the primary surface.
 - CLI: `--help` / `flag.Usage`. Give it a one-line purpose + synopsis banner.
 
 ## Distribution model — does the manual travel?
@@ -35,9 +38,9 @@ agnostic `GUIDELINE.md`. Go is the most-validated ecosystem and the easiest case
 - **`go install` needs the module path to match the repo URL.** If `go.mod` says
   `module foo` but the README says `go install github.com/x/foo@latest`, install
   fails. Verify they agree.
-- `gofmt` + `go vet` are free in-toolchain checks (the Principle-2 drift defense most
-  ecosystems must wire up manually). A generated/edited file that isn't `gofmt`ed
-  is a smell.
+- `gofmt` + `go vet` are free in-toolchain checks (the §3a drift defense most
+  ecosystems must wire up manually — see GUIDELINE §4c). A generated/edited file
+  that isn't `gofmt`ed is a smell.
 - For batch CLIs, exit codes should reflect per-item failure (don't exit 0 when an
   item failed) and unattended mode shouldn't block on an interactive prompt — both
   are common CLI-overlay findings.
