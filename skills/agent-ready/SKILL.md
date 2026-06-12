@@ -23,11 +23,11 @@ there (e.g. the skill was bare-copied, or your harness imported only the skill
 component without the rest of the plugin), recover in this order:
 
 1. **If you can fetch URLs**, read the missing support files directly from the published
-   release. **This skill is release `v0.3.10`** — fetch from that matching tag so the
+   release. **This skill is release `v0.3.11`** — fetch from that matching tag so the
    guide can't drift past the skill:
-   `https://raw.githubusercontent.com/mixcode/agent-friendly-guide/v0.3.10/<path>` — e.g.
-   `…/v0.3.10/GUIDELINE.md`, `…/v0.3.10/languages/<lang>.md`,
-   `…/v0.3.10/templates/llms-full.txt`. **Never fetch `main`** (it may have moved past
+   `https://raw.githubusercontent.com/mixcode/agent-friendly-guide/v0.3.11/<path>` — e.g.
+   `…/v0.3.11/GUIDELINE.md`, `…/v0.3.11/languages/<lang>.md`,
+   `…/v0.3.11/templates/llms-full.txt`. **Never fetch `main`** (it may have moved past
    this version — that would be drift). Fetch **only what you need** (the guide, the one
    language file for this repo, and the templates you'll fill) — not the whole tree.
    (The version literal above is this skill's own release tag; it is bumped with each
